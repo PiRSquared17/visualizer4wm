@@ -55,45 +55,6 @@ function getContentFromMediaWiki ($p_pageName,$p_projectUrl)
 
 
 /**
- ** @brief Return an array of data from the wiki source code
- ** @param p_content source code of the wikipage (string)
- ** @param p_tableType table type
- ** @details
- ** Cette fonction a pour objectif parser la syntaxe du modele visualize dans le code
- ** source d'une document MediaWiki.
- ** La syntaxe du modele est la suivante :
- ** MediaWiki template sample
- ** {{visualize|
- **  {{dataset| en | 2003/0/1 | 10000 | 20000 | East }}
- **  {{dataset| fr | 2003/0/1 | 5000 | 10000 | West }}
- ** }}
- */
-function getDataFromContent($p_content, $p_templateType)
-{
-
-    $l_tableContent = strstr($p_content, '{{visualizer');
-    if (false==$l_tableContent)
-    {
-      $l_tableContent = strstr($p_content, '{{Visualizer');
-    }
-    if (false==$l_tableContent)
-    {
-      return "error1";
-    }
-
-    $l_endingContent = strstr( $l_tableContent, "\n|}");
-    if (false==$l_endingContent)
-    {
-       return "error2";
-    }
-    $l_tableContent=substr( $l_tableContent, 0, -strlen($l_endingContent) );
-
-    $l_line = explode("|-", $l_tableContent);
-    return $l_line;
-
-}
-
-/**
  ** @brief motionChart only - Return javascript rows of data
  ** @param $p_content page content
  ** @details
@@ -192,6 +153,44 @@ $p_javascriptRows
     </script>
 MYJSCODE;
 	      return array('html'=>$l_htmlcode,'js'=>$l_jscode);
+}
+
+
+/**
+ ** @brief Return an array of data from the wiki source code
+ ** @param p_content source code of the wikipage (string)
+ ** @param p_templateName template name
+ ** @details
+ ** {|
+ ** |+ text {{visualizer| }}
+ ** ! en !! 2003/0/1 !! East
+ ** |-
+ ** | dataset || 68465 || 26843 
+ ** |}
+ */
+function getDataFromContent($p_content, $p_templateName)
+{
+
+    $l_tableContent = strstr($p_content, "{{".ucfirst($p_templateName));
+    if (false==$l_tableContent)
+    {
+      $l_tableContent = strstr($p_content, "{{".lcfirst($p_templateName));
+    }
+    if (false==$l_tableContent)
+    {
+      return "error1";
+    }
+
+    $l_endingContent = strstr( $l_tableContent, "\n|}");
+    if (false==$l_endingContent)
+    {
+       return "error2";
+    }
+    $l_tableContent=substr( $l_tableContent, 0, -strlen($l_endingContent) );
+
+    $l_line = explode("|-", $l_tableContent);
+    return $l_line;
+
 }
 
 

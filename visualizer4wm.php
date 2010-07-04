@@ -71,24 +71,6 @@ function getContentFromMediaWiki ($p_pageName,$p_projectUrl)
 function getDataFromContent($p_content, $p_templateType)
 {
 
-  if ("motionchartTpl"==$p_templateType)
-  {
-
-    $datasetPatten = "{{\s*dataset\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*}}";
-    $pattern = sprintf("/{{\s*visualize\s*\|.*?(%s)+.*}}/misSU", $datasetPatten);
-    preg_match_all($pattern, $p_content, $matches);
-    if (!count($matches))
-      return "errorMC";
-    if (!count($matches[0]))
-      return "errorMC";
-    preg_match_all(sprintf("/%s/misSu", $datasetPatten), $matches[0][0], $matchedData, PREG_SET_ORDER);
-
-    return $matchedData;
-
-  }
-  elseif ("visualizer"==$p_templateType)
-  {
-
     $l_tableContent = strstr($p_content, '{{visualizer');
     if (false==$l_tableContent)
     {
@@ -109,37 +91,50 @@ function getDataFromContent($p_content, $p_templateType)
     $l_line = explode("|-", $l_tableContent);
     return $l_line;
 
-  }
-  else
-  {
-    exit ("Error: parameter tpl=$p_templateType is not valid in getDataFromContent()");
-  }
 }
 
 /**
  ** @brief motionChart only - Return javascript rows of data
- ** @param p_pregMatchData donnes retournee par getDataFromContent
+ ** @param $p_content page content
  ** @details
- ** Cette fonction a pour objectif de construire une chaine de caractere correspondant a la
- ** declaration d'un tableau en Javascript. Cette chaine de caractere contient les donnes qui
- ** ont ete parsees par getDataFromContent dans le document source de la page wiki.
+ ** MediaWiki template sample:
  **
- ** Le format attendu est le suivant :
+ ** {{visualize|
+ **  {{dataset| en | 2003/0/1 | 10000 | 20000 | East }}
+ **  {{dataset| fr | 2003/0/1 | 5000 | 10000 | West }}
+ ** }}
+ **
+ **     to ->
  **
  ** ['fr',new Date (2003,0,1),5000,10000,'West'],
  ** ['it',new Date (2003,0,1),3000,7000,'East'],
  */
-function motionChart_generateJsFromData($p_pregMatchData)
+function motionChart_generateJsFromContent($p_content)
 {
+
+  $datasetPatten = "{{\s*dataset\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*}}";
+  $pattern = sprintf("/{{\s*visualize\s*\|.*?(%s)+.*}}/misSU", $datasetPatten);
+  preg_match_all($pattern, $p_content, $matches);
+  if (!count($matches))
+    return null;
+  if (!count($matches[0]))
+    return null;
+  preg_match_all(sprintf("/%s/misSu", $datasetPatten), $matches[0][0], $matchedData, PREG_SET_ORDER);
+
+  $l_pregMatchedData=$matchedData;
+
+  if (null==$l_pregMatchedData)
+      return null;
+
   $javascriptRows = Array();
 
-  for ($i = 0; $i < count($p_pregMatchData); $i++)
+  for ($i = 0; $i < count($l_pregMatchedData); $i++)
   {
-    $id = trim($p_pregMatchData[$i][1]);
-    $date = trim($p_pregMatchData[$i][2]);
-    $xData = trim($p_pregMatchData[$i][3]);
-    $yData = trim($p_pregMatchData[$i][4]);
-    $label = trim($p_pregMatchData[$i][5]);
+    $id = trim($l_pregMatchedData[$i][1]);
+    $date = trim($l_pregMatchedData[$i][2]);
+    $xData = trim($l_pregMatchedData[$i][3]);
+    $yData = trim($l_pregMatchedData[$i][4]);
+    $label = trim($l_pregMatchedData[$i][5]);
     sscanf($date, "%d/%d/%d", $dateYear, $dateMonth, $dateDay);
     $jsRow = sprintf("['%s',new Date(%d,%d,%d),%d,%d,'%s']", $id, $dateYear, $dateMonth, $dateDay, $xData, $yData, $label);
     array_push($javascriptRows, $jsRow);
@@ -212,7 +207,7 @@ function printHTML($p_javaScriptCode="",
 {
 
   if (''==$p_htmlCode) {
-    $p_htmlCode='<div id="index">Welcome on this tool. It runs just as a proof of concept. <a href="?page=User:Al_Maghi/Visualize_Wikipedias_growth_up_to_2010&amp;project=en.wikipedia.org&amp;y=Bytes+per+article&amp;x=Articles&amp;group=Wikipedias">
+    $p_htmlCode='<div id="index">Welcome on this tool. It runs just as a proof of concept. <a href="?page=User:Al_Maghi/Visualize_Wikipedias_growth_up_to_2010&amp;project=en.wikipedia.org&amp;tpl=motion&amp;y=Bytes+per+article&amp;x=Articles&amp;group=Wikipedias">
 		  See it in action</a>.</div>';
   }
 
@@ -231,7 +226,7 @@ function printHTML($p_javaScriptCode="",
     <h3>Data Visualizer</h3>
     $p_htmlCode
     <div id="documentation">
-    	<tt>{{<a href="http://en.wikipedia.org/wiki/Template:Visualize">Visualize</a>}}</tt> &nbsp;
+    	<tt>{{<a href="http://meta.wikipedia.org/wiki/visualizer4wm">Visualizer</a>}}</tt> &nbsp;
       &#8734; &nbsp; The data visualizer tool is kindly served to you by the <span class="hidden"><a href="http://toolserver.org/">Wikimedia Toolserver</a>.
       	It uses the <a href="http://mediawiki.org/wiki/API">MediaWiki</a>
       	and the <a href="http://code.google.com/intl/fr-FR/apis/visualization/documentation/gallery/motionchart.html">Vizualisation</a></span> APIs.
@@ -269,7 +264,7 @@ function main()
 					  'wikisource.org',
 					  'wikiversity.org'),
 
-    'templates'		=>	array('motionchartTpl', 'visualizer'),
+    'templates'		=>	array('motion', 'visualizer'),
 
      // Example types are found here: http://code.google.com/intl/fr-FR/apis/chart/docs/gallery/chart_gall.html
     'chart types'		=>	array('pie',
@@ -299,56 +294,57 @@ function main()
     exit("Sorry but <a href=\"http://$l_projectDomain\">$l_projectDomain</a> is not an authorised domain name. (Contact us if you want to authorise a new domain name.)<br />The <tt>project</tt> parameter should be something such as en.wikipedia.org.");
   }
 
-  # Get the table type and check it.
-  $l_templateType  = get("tpl", "motionchartTpl");
+  # Get the template type and check it.
+  $l_templateType  = get("tpl", "motion");
   if ( !in_array( $l_templateType, $l_parameters['templates'])) {
-    exit("Sorry but the template parameter <tt>tpl=$l_templateType</tt> is not valid.");
+    exit("Sorry but the template parameter <tt>tpl=$l_templateType</tt> is not an authorised template.");
   }
 
-  # Get the chart type and check it.
-  $l_chartType  = get("ct", "pie");
-  if ( !in_array( $l_chartType, $l_parameters['chart types'])) {
-    exit("Sorry but the chart type \"$l_chartType\" is not valid.");
-  }
-
-  # Get the api and check if it handles the chart type.
-  $l_apiType  = get("api", "gc");
-  if ( !in_array( $l_apiType, $l_parameters['apis'])) {
-    exit("Sorry but the api \"$l_apiType\" is not valid.");
-  }
 
   # Try to get content from MediaWiki or exit.
   $l_pageContent = getContentFromMediaWiki($l_pageName,$l_projectUrl);
 
-  # Try to get data from content.
-  $l_pregMatchedDataArray = getDataFromContent($l_pageContent,$l_templateType);
-  if ('error1'==$l_pregMatchedDataArray) {
-    exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_pageName</a> does not contain the string: <tt>{{Visualizer</tt><br />Check the template parameter <tt>tpl=$l_templateType</tt>");
-  }
-  if ('error2'==$l_pregMatchedDataArray) {
-    exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_pageName</a> does not contain the line: <tt>|}</tt>");
-  }
-  if ('errorMC'==$l_pregMatchedDataArray) {
-    exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_pageName</a> is not using correctly {{dataset}} and {{visualize}}.<br />Check the template parameter <tt>tpl=$l_templateType</tt>");
-  }
 
 
-  # Generate the charting JavaScript and html and print it.
-  if ("motionchartTpl"==$l_templateType)
+  # Generate the chart and print it.
+  if ("motion"==$l_templateType)
   {
-    $l_javascriptRows = motionChart_generateJsFromData($l_pregMatchedDataArray);
-
+    $l_javascriptRows = motionChart_generateJsFromContent($l_pageContent);
+    if (null==$l_javascriptRows) {
+      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_pageName</a> is not using correctly {{dataset}} and {{visualize}}.<br />Check the template parameter <tt>tpl=$l_templateType</tt>");
+    }
     $l_xAxisCaption  = get("x",     "x axis");
     $l_yAxisCaption  = get("y",     "y axis");
     $l_groupName     = get("group", "Labels");
     $l_jsHtml = motionChart_setJsAndHtml($l_pageName, $l_projectUrl, $l_javascriptRows, $l_groupName, $l_xAxisCaption, $l_yAxisCaption);
     printHTML($l_jsHtml['js'], $l_jsHtml['html']);
-    
   }
-  elseif ("visualizer"==$l_templateType)
+  else
   {
-    printHTML('',"$l_pregMatchedDataArray[0]<br/>$l_pregMatchedDataArray[1]");
-  } else {
+    # Try to get data from content or return an error.
+    $l_dataLines = getDataFromContent($l_pageContent,$l_templateType);
+    if ('error1'==$l_dataLines) {
+      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_pageName</a> does not contain the string: <tt>{{Visualizer</tt><br />Check the template parameter <tt>tpl=$l_templateType</tt>");
+    }
+    if ('error2'==$l_dataLines) {
+      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_pageName</a> does not contain the line: <tt>|}</tt>");
+    }
+
+    /*
+    # Get the chart type and check it.
+    $l_chartType  = get("ct", "pie");
+    if ( !in_array( $l_chartType, $l_parameters['chart types'])) {
+      exit("Sorry but the chart type \"$l_chartType\" is not valid.");
+    }
+
+    # Get the api and check if it handles the chart type.
+    $l_apiType  = get("api", "gc");
+    if ( !in_array( $l_apiType, $l_parameters['apis'])) {
+      exit("Sorry but the api \"$l_apiType\" is not valid.");
+    }
+    */
+
+    printHTML('',"$l_dataLines[0]<br/>$l_dataLines[1]");
   }
 }
 

@@ -1,38 +1,11 @@
 <?php
-/** @file wikiDataVisualizer.php
- ** @brief Visualize data published on a wikipage
- ** @details Visualize data using MediaWiki and Google Visualization APIs.
- ** It offers an animated visualization of data published on a wikipage using {{visualize}} template.
+/** @file visualizer4wm.php
+ ** @brief Visualize data published on a wikimedia project
+ ** @details Visualize data using MediaWiki and charting APIs.
+ ** It offers visualization of data published on a wikipage using {{visualize}} or {{visualizer}} templates.
  ** Authors include [[w:fr:User:Al Maghi]] and Xavier Marcelet.
  **/
 
-// This parameter will be a local parameter in main().
-$g_parameters = array(
-  'authorised domains'	=>	array('wikipedia.org',
-				      'wikimedia.org',
-				      'wikibooks.org',
-				      'wikiquote.org',
-				      'mediawiki.org',
-				      'wikinews.org',
-				      'wiktionary.org',
-				      'wikisource.org',
-				      'wikiversity.org'),
-
-  'table types'		=>	array('motionchartTable',
-				      'linesComparison-DateCol'),
-
-  // http://code.google.com/intl/fr-FR/apis/chart/docs/gallery/chart_gall.html
-  'chart types'		=>	array('pie',
-				      // Bars
-				      'bhs', 'bvs', 'bhg', 'bvg', 'bvo',
-				      // Lines
-				      'lines',
-				      // Venne
-				      'venne',
-				      // Motion
-				      'gglemotion',
-	),
-);
 
 /**
  ** @brief get url parameter
@@ -84,6 +57,7 @@ function getContentFromMediaWiki ($p_pageName,$p_projectUrl)
 /**
  ** @brief Return an array of data from the wiki source code
  ** @param p_content source code of the wikipage (string)
+ ** @param p_tableType table type
  ** @details
  ** Cette fonction a pour objectif parser la syntaxe du modele visualize dans le code
  ** source d'une document MediaWiki.
@@ -129,7 +103,7 @@ function getDataFromContent($p_content, $p_tableType)
 }
 
 /**
- ** @brief Return javascript rows of data
+ ** @brief motionChart only - Return javascript rows of data
  ** @param p_pregMatchData donnes retournee par getDataFromContent
  ** @details
  ** Cette fonction a pour objectif de construire une chaine de caractere correspondant a la
@@ -141,7 +115,7 @@ function getDataFromContent($p_content, $p_tableType)
  ** ['fr',new Date (2003,0,1),5000,10000,'West'],
  ** ['it',new Date (2003,0,1),3000,7000,'East'],
  */
-function generateJsFromData($p_pregMatchData)
+function motionChart_generateJsFromData($p_pregMatchData)
 {
   $javascriptRows = Array();
 
@@ -161,7 +135,7 @@ function generateJsFromData($p_pregMatchData)
 
 
 /**
- ** @brief Set the js and the html to be printed.
+ ** @brief motionChart only - Set the js and the html to be printed.
  ** @param $p_pageName
  ** @param $p_javaScriptRows,
  ** @param $p_projectUrl,
@@ -171,7 +145,7 @@ function generateJsFromData($p_pregMatchData)
  ** @details Retrun an array of js and html.
  **
  */
-function setJsAndHtml($p_pageName, $p_projectUrl, $p_javascriptRows, $p_groupName, $p_xAxisCaption, $p_yAxisCaption)
+function motionChart_setJsAndHtml($p_pageName, $p_projectUrl, $p_javascriptRows, $p_groupName, $p_xAxisCaption, $p_yAxisCaption)
 {
   $p_displayedPageName = str_replace('_', ' ', $p_pageName);
 
@@ -256,11 +230,10 @@ MYHMTLPAGE;
 
 /**
  ** @brief The main function
- ** @details Set user_agent, fetch url args, get source, get data from source, generate JavaScript rows of data, print valid xhtml.
+ ** @details Set user_agent, fetch url args, check parameters, get source, get data from source, generate JavaScript and html, print valid xhtml.
  */
 function main()
 {
-  global $g_parameters;
 
   ini_set('user_agent', 'Al Maghi\'s wikiDataVisualizer.php script');
 
@@ -270,50 +243,88 @@ function main()
     exit(printHTML());
   }
 
+  # Set the local parameters.
+  $l_parameters = array(
+    'authorised domains'	=>	array('wikipedia.org',
+					  'wikimedia.org',
+					  'wikibooks.org',
+					  'wikiquote.org',
+					  'mediawiki.org',
+					  'wikinews.org',
+					  'wiktionary.org',
+					  'wikisource.org',
+					  'wikiversity.org'),
+
+    'table types'		=>	array('motionchartTable',
+					  'linesComparison-DateCol',
+					),
+
+     // Example types are found here: http://code.google.com/intl/fr-FR/apis/chart/docs/gallery/chart_gall.html
+    'chart types'		=>	array('pie',
+					  // Bars
+					  'bhs', 'bvs', 'bhg', 'bvg', 'bvo',
+					  // Lines
+					  'lines',
+					  // Venne
+					  'venne',
+					  // Motion
+					  'gglemotion',
+					),
+    'apis'			=>	array(
+					    // Google Chart image api
+					    'gc',
+					    // Google Visualization interactive api
+					    'gv',
+					    // PHP chart api
+					    'pchart',
+					 ),
+  );
+
   # Get the project url and check its domain name.
   $l_projectUrl = get("project", "en.wikipedia.org");
   $l_projectDomain = substr(strstr($l_projectUrl, '.'),1);
-  if ( !in_array( $l_projectDomain, $g_parameters['authorised domains'])) {
+  if ( !in_array( $l_projectDomain, $l_parameters['authorised domains'])) {
     exit("Sorry but <a href=\"http://$l_projectDomain\">$l_projectDomain</a> is not an authorised domain name. (Contact us if you want to authorise a new domain name.)<br />The <tt>project</tt> parameter should be something such as en.wikipedia.org.");
   }
 
-  # Get the table type and check.
-  $l_tableType  = get("type", "motionchartTable"); // should be getting "table"
-  if ( !in_array( $l_tableType, $g_parameters['table types'])) {
+  # Get the table type and check it.
+  $l_tableType  = get("table", "motionchartTable");
+  if ( !in_array( $l_tableType, $l_parameters['table types'])) {
     exit("Sorry but the table type \"$l_tableType\" is not valid.");
   }
 
-  # Get the chart type and check.
-  $l_chartType  = get("ct", "pie"); // should be getting "table"
-  if ( !in_array( $l_tableType, $g_parameters['chart types'])) {
+  # Get the chart type and check it.
+  $l_chartType  = get("ct", "pie");
+  if ( !in_array( $l_chartType, $l_parameters['chart types'])) {
     exit("Sorry but the chart type \"$l_chartType\" is not valid.");
   }
 
   # Get the api and check if it handles the chart type.
+  $l_apiType  = get("api", "gc");
+  if ( !in_array( $l_apiType, $l_parameters['apis'])) {
+    exit("Sorry but the api \"$l_apiType\" is not valid.");
+  }
 
+  # Try to get content from MediaWiki.
+  $l_pageContent = getContentFromMediaWiki($l_pageName,$l_projectUrl);
 
-  # Runs...
+  # Try to get data from content.
+  $l_pregMatchedDataArray = getDataFromContent($l_pageContent,$l_tableType);
+
+  # Generate the charting JavaScript and html and print it.
   if ("motionchartTable"==$l_tableType)
   {
+    $l_javascriptRows = motionChart_generateJsFromData($l_pregMatchedDataArray);
 
-    $l_pageContent = getContentFromMediaWiki($l_pageName,$l_projectUrl);
-
-    $l_pregMatchedDataArray = getDataFromContent($l_pageContent,$l_tableType);
-    $l_javascriptRows = generateJsFromData($l_pregMatchedDataArray);
-
-
-    $l_xAxisCaption  = get("x",     "Articles");
-    $l_yAxisCaption  = get("y",     "Bytes per article");
-    $l_groupName     = get("group", "Wikipedias");
-    $l_jsHtml = setJsAndHtml($l_pageName, $l_projectUrl, $l_javascriptRows, $l_groupName, $l_xAxisCaption, $l_yAxisCaption);
+    $l_xAxisCaption  = get("x",     "x axis");
+    $l_yAxisCaption  = get("y",     "y axis");
+    $l_groupName     = get("group", "Labels");
+    $l_jsHtml = motionChart_setJsAndHtml($l_pageName, $l_projectUrl, $l_javascriptRows, $l_groupName, $l_xAxisCaption, $l_yAxisCaption);
     printHTML($l_jsHtml['js'], $l_jsHtml['html']);
     
   }
   elseif ("wikitable"==$l_tableType)
   {
-    
-    $l_pageContent = getContentFromMediaWiki($l_pageName,$l_projectUrl);
-    $l_pregMatchedDataArray = getDataFromContent($l_pageContent,$l_tableType);
 
     echo 'hello! <br /><br />'. $l_pregMatchedDataArray[0];
   } else {

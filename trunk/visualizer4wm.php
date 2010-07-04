@@ -237,7 +237,7 @@ function printHTML($p_javaScriptCode="",
     <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
     <title>Data Visualizer: visualize the data published on a wikipage</title>
     $p_javaScriptCode
-    <link rel="stylesheet" href="./visualizer.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="./visualizer4wm.css" type="text/css" media="screen" />
   </head>
   <body>
     <h3>Data Visualizer</h3>

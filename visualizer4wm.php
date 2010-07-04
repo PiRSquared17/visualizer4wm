@@ -167,6 +167,11 @@ MYJSCODE;
  ** |-
  ** | dataset || 68465 || 26843 
  ** |}
+ **
+ ** -> to
+ **
+ ** line[0]:  {{visualizer|text}} ! date !! A !! B !! C
+ ** line[1]:  |2009/10/01 || 2464585 || 2325667 || 857585 
  */
 function getDataFromContent($p_content, $p_templateName)
 {

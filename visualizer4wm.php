@@ -68,38 +68,52 @@ function getContentFromMediaWiki ($p_pageName,$p_projectUrl)
  **  {{dataset| fr | 2003/0/1 | 5000 | 10000 | West }}
  ** }}
  */
-function getDataFromContent($p_content, $p_tableType)
+function getDataFromContent($p_content, $p_templateType)
 {
 
-	if ("motionchartTable"==$p_tableType)
-	{
+  if ("motionchartTpl"==$p_templateType)
+  {
 
-	      $datasetPatten = "{{\s*dataset\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*}}";
-	      $pattern = sprintf("/{{\s*visualize\s*\|.*?(%s)+.*}}/misSU", $datasetPatten);
-	      preg_match_all($pattern, $p_content, $matches);
-	      if (!count($matches))
-		return null;
-	      if (!count($matches[0]))
-		return null;
-	      preg_match_all(sprintf("/%s/misSu", $datasetPatten), $matches[0][0], $matchedData, PREG_SET_ORDER);
+    $datasetPatten = "{{\s*dataset\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*}}";
+    $pattern = sprintf("/{{\s*visualize\s*\|.*?(%s)+.*}}/misSU", $datasetPatten);
+    preg_match_all($pattern, $p_content, $matches);
+    if (!count($matches))
+      return "errorMC";
+    if (!count($matches[0]))
+      return "errorMC";
+    preg_match_all(sprintf("/%s/misSu", $datasetPatten), $matches[0][0], $matchedData, PREG_SET_ORDER);
 
-	      return $matchedData;
-  
-	} elseif ("wikitable"==$p_tableType) {
-	      $datasetPatten = "|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*}}";
-	      $pattern = sprintf("/{{\s*visualizer\s*\|-.*?(%s)+.*|}/misSU", $datasetPatten);
-	      preg_match_all($pattern, $p_content, $matches);
-	      if (!count($matches))
-		return null;
-	      if (!count($matches[0]))
-		return null;
-	      preg_match_all(sprintf("/%s/misSu", $datasetPatten), $matches[0][0], $matchedData, PREG_SET_ORDER);
+    return $matchedData;
 
-	      return $matchedData;
-	} else {
-	      exit ("Error: parameter ChartType: $p_tableType is not valid in getDataFromContent()");
-	}
+  }
+  elseif ("visualizer"==$p_templateType)
+  {
 
+    $l_tableContent = strstr($p_content, '{{visualizer');
+    if (false==$l_tableContent)
+    {
+      $l_tableContent = strstr($p_content, '{{Visualizer');
+    }
+    if (false==$l_tableContent)
+    {
+      return "error1";
+    }
+
+    $l_endingContent = strstr( $l_tableContent, "\n|}");
+    if (false==$l_endingContent)
+    {
+       return "error2";
+    }
+    $l_tableContent=substr( $l_tableContent, 0, -strlen($l_endingContent) );
+
+    $l_line = explode("|-", $l_tableContent);
+    return $l_line;
+
+  }
+  else
+  {
+    exit ("Error: parameter tpl=$p_templateType is not valid in getDataFromContent()");
+  }
 }
 
 /**
@@ -235,7 +249,7 @@ MYHMTLPAGE;
 function main()
 {
 
-  ini_set('user_agent', 'Al Maghi\'s wikiDataVisualizer.php script');
+  ini_set('user_agent', 'Al Maghi\'s visualizer4wm.php script');
 
   # Get the page name or print default html.
   $l_pageName   = str_replace(' ','_',get("page", "_"));
@@ -255,9 +269,7 @@ function main()
 					  'wikisource.org',
 					  'wikiversity.org'),
 
-    'table types'		=>	array('motionchartTable',
-					  'linesComparison-DateCol',
-					),
+    'templates'		=>	array('motionchartTpl', 'visualizer'),
 
      // Example types are found here: http://code.google.com/intl/fr-FR/apis/chart/docs/gallery/chart_gall.html
     'chart types'		=>	array('pie',
@@ -288,9 +300,9 @@ function main()
   }
 
   # Get the table type and check it.
-  $l_tableType  = get("table", "motionchartTable");
-  if ( !in_array( $l_tableType, $l_parameters['table types'])) {
-    exit("Sorry but the table type \"$l_tableType\" is not valid.");
+  $l_templateType  = get("tpl", "motionchartTpl");
+  if ( !in_array( $l_templateType, $l_parameters['templates'])) {
+    exit("Sorry but the template parameter <tt>tpl=$l_templateType</tt> is not valid.");
   }
 
   # Get the chart type and check it.
@@ -305,14 +317,24 @@ function main()
     exit("Sorry but the api \"$l_apiType\" is not valid.");
   }
 
-  # Try to get content from MediaWiki.
+  # Try to get content from MediaWiki or exit.
   $l_pageContent = getContentFromMediaWiki($l_pageName,$l_projectUrl);
 
   # Try to get data from content.
-  $l_pregMatchedDataArray = getDataFromContent($l_pageContent,$l_tableType);
+  $l_pregMatchedDataArray = getDataFromContent($l_pageContent,$l_templateType);
+  if ('error1'==$l_pregMatchedDataArray) {
+    exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_pageName</a> does not contain the string: <tt>{{Visualizer</tt><br />Check the template parameter <tt>tpl=$l_templateType</tt>");
+  }
+  if ('error2'==$l_pregMatchedDataArray) {
+    exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_pageName</a> does not contain the line: <tt>|}</tt>");
+  }
+  if ('errorMC'==$l_pregMatchedDataArray) {
+    exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_pageName</a> is not using correctly {{dataset}} and {{visualize}}.<br />Check the template parameter <tt>tpl=$l_templateType</tt>");
+  }
+
 
   # Generate the charting JavaScript and html and print it.
-  if ("motionchartTable"==$l_tableType)
+  if ("motionchartTpl"==$l_templateType)
   {
     $l_javascriptRows = motionChart_generateJsFromData($l_pregMatchedDataArray);
 
@@ -323,10 +345,9 @@ function main()
     printHTML($l_jsHtml['js'], $l_jsHtml['html']);
     
   }
-  elseif ("wikitable"==$l_tableType)
+  elseif ("visualizer"==$l_templateType)
   {
-
-    echo 'hello! <br /><br />'. $l_pregMatchedDataArray[0];
+    printHTML('',"$l_pregMatchedDataArray[0]<br/>$l_pregMatchedDataArray[1]");
   } else {
   }
 }

@@ -1,0 +1,25 @@
+div#chart_div {width: 600px; height: 300px;}
+div#info {background:lightyellow; border:2px solid #ffdead; 
+  margin:1em 1em 1em 2.5em; 
+  padding:.4em 1em;
+  display:inline;
+  -moz-border-radius:1em;
+  border-radius:1em;
+  -webkit-border-radius:1em;
+  }
+div#info a:link {text-decoration: none; color: #0645AD;}
+div#info a:visited {text-decoration: none; color: #0645AD;} 
+div#info a:active {text-decoration: none; color: #0645AD;}
+div#info a:hover {text-decoration: Underline; color: #0645AD;}
+
+div#documentation {
+      position:absolute;
+      bottom:1em;
+      margin-left:1em;
+      color:#595454;
+      font-size: 87%;
+      }
+span.hidden a:link {text-decoration: none;color:#595454; } 
+span.hidden a:visited {text-decoration: none;color:#595454;} 
+span.hidden a:active {text-decoration: none;color:#595454;}
+span.hidden a:hover {text-decoration: Underline;}

@@ -17,24 +17,24 @@ function printHTML($p_PrintedContent)
     if ("" == $p_PrintedContent) 
     {
 	    $p_PrintedContent = '
-	    <h3>csv2visualize - Convert a csv file to a MediaWiki-formatted table</h3>
+      <h3>cvs2wikitable - Generate a MediaWiki-formatted table from a csv file</h3>
 
       <div id="main">
-		    <p>An example csv content would be:</p>
-		    <div class="pre">
-			id, date, Xvalue, Yvalue, group<br />
-			Paris, december 2003, 2846546, 654645, Europe<br />
-			London, 2006-7-35 22:00:00, 546544, 5646548, Europe<br />
-		    </div>
-		    <span class="info">Semicolons can replace commas. Double quotes will be removed.</span>
+	<p>An example csv content would be:</p>
+	<div class="pre">
+	    id, date, Xvalue, Yvalue, group<br />
+	    Paris, december 2003, 2846546, 654645, Europe<br />
+	    London, 2006-7-35 22:00:00, 546544, 5646548, Europe<br />
+	</div>
+	<span class="info">Semicolons can replace commas. Double quotes will be removed.</span>
 
-		    <form method="post" enctype="multipart/form-data" action="csv2wikitable.php">
-			    <p>
-			    <input type="file" name="csvFile" size="40" />
-			    <input type="submit" name="uploadcsv" value="Send csv file" />
-			    </p>
-		    </form>
-	    </div>  
+	<form method="post" enctype="multipart/form-data" action="csv2wikitable.php">
+		<p>
+		<input type="file" name="csvFile" size="40" />
+		<input type="submit" name="uploadcsv" value="Send csv file" />
+		</p>
+	</form>
+      </div>  
 	    ';
     } else {
     	

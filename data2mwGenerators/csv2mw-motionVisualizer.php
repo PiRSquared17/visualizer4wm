@@ -12,61 +12,61 @@
  */
 function printHTML($p_PrintedContent)
 {
-    header('Content-type: text/html; charset=UTF-8');
+  header('Content-type: text/html; charset=UTF-8');
 
-    if ("" == $p_PrintedContent) 
-    {
-	    $p_PrintedContent = '
-	    <h3>csv2visualize - Convert a csv file to formated data for {{<a href="http://en.wikipedia.org/wiki/Template:Visualize">Visualize</a>}}</h3>
+  if ("" == $p_PrintedContent) 
+  {
+    $p_PrintedContent = '
+    <h3>csv2visualize - Convert a csv file to formated data for {{<a href="http://en.wikipedia.org/wiki/Template:Visualize">Visualize</a>}}</h3>
 
-      <div id="main">
-		    <p>Your table should have 4 or 5 columns: <tt>id</tt>, <tt>date</tt>, <tt>x</tt>, <tt>y,</tt> <tt>group</tt>. An example csv content would be:</p>
-		    <div class="pre">
-			id, date, Xvalue, Yvalue, group<br />
-			Paris, december 2003, 2846546, 654645, Europe<br />
-			London, 2006-7-35 22:00:00, 546544, 5646548, Europe<br />
-		    </div>
-		    <span class="info">The first line of your file will be ignored.</span>
-		    <span class="info">Dates should be in english or in digit.</span>
-		    <span class="info">The fifth column (<tt>group</tt>) is optional. If none, group value will be equal to id.</span>
-		    <span class="info">Semicolons can replace commas. Double quotes will be removed.</span>
+    <div id="main">
+      <p>Your table should have 4 or 5 columns: <tt>id</tt>, <tt>date</tt>, <tt>x</tt>, <tt>y,</tt> <tt>group</tt>. An example csv content would be:</p>
+      <div class="pre">
+	  id, date, Xvalue, Yvalue, group<br />
+	  Paris, december 2003, 2846546, 654645, Europe<br />
+	  London, 2006-7-35 22:00:00, 546544, 5646548, Europe<br />
+      </div>
+      <span class="info">The first line of your file will be ignored.</span>
+      <span class="info">Dates should be in english or in digit.</span>
+      <span class="info">The fifth column (<tt>group</tt>) is optional. If none, group value will be equal to id.</span>
+      <span class="info">Semicolons can replace commas. Double quotes will be removed.</span>
 
-		    <form method="post" enctype="multipart/form-data" action="csv2mw-motionVisualizer.php">
-			    <p>
-			    <input type="file" name="csvFile" size="40" />
-			    <input type="submit" name="uploadcsv" value="Send csv file" />
-			    </p>
-		    </form>
-	    </div>
-	    <hr />
-      <div id="alternative">
-		<h3>- OR - convert two files: one with X axis data and one with Y axis data.</h3>
-		    <p>Your two tables should look similar. An example csv content would be:</p>
-		<div class="pre" id="second-csv-example">
-			date, id1, id2, id3, etc.<br />
-			december 2003, 921015,51621,54113,etc.
-		</div>
+      <form method="post" enctype="multipart/form-data" action="csv2mw-motionVisualizer.php">
+	<p>
+	<input type="file" name="csvFile" size="40" />
+	<input type="submit" name="uploadcsv" value="Send csv file" />
+	</p>
+      </form>
+    </div>
+	  <hr />
+    <div id="alternative">
+	<h3>- OR - convert two files: one with X axis data and one with Y axis data.</h3>
+	    <p>Your two tables should look similar. An example csv content would be:</p>
+	<div class="pre" id="second-csv-example">
+		date, id1, id2, id3, etc.<br />
+		december 2003, 921015,51621,54113,etc.
+	</div>
 
-		<form method="post" enctype="multipart/form-data" action="csv2mw-motionVisualizer.php">
-		    <p>
-		    <span class="info">X axis data file: <input type="file" name="csvXFile" size="55" /></span>
-		    <span class="info">Y axis data file: <input type="file" name="csvYFile" size="55" /><input type="submit" name="upload2csv" value="Send two csv files" /></span>
-		    </p>
-		</form>
-	    </div>	    
-	    ';
-    } else {
-    	
-        $p_PrintedContent =  str_replace("  ",'&nbsp;&nbsp;',$p_PrintedContent);
-        $p_PrintedContent =  str_replace("\n",'<br />',$p_PrintedContent);
-        
-	$p_PrintedContent = 'Thank you for using this tool!
-	<div class="pre" id="mediawiki">
-	'.$p_PrintedContent.'
-	</div>';        
-    }
+	<form method="post" enctype="multipart/form-data" action="csv2mw-motionVisualizer.php">
+	    <p>
+	    <span class="info">X axis data file: <input type="file" name="csvXFile" size="55" /></span>
+	    <span class="info">Y axis data file: <input type="file" name="csvYFile" size="55" /><input type="submit" name="upload2csv" value="Send two csv files" /></span>
+	    </p>
+	</form>
+    </div>';
 
-    echo <<<MYHMTLCODE
+  } else {
+      
+    $p_PrintedContent =  str_replace("  ",'&nbsp;&nbsp;',$p_PrintedContent);
+    $p_PrintedContent =  str_replace("\n",'<br />',$p_PrintedContent);
+    
+    $p_PrintedContent = 'Thank you for using this tool!
+    <div class="pre" id="mediawiki">
+    '.$p_PrintedContent.'
+    </div>';        
+  }
+
+  echo <<<MYHMTLCODE
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
   <head>

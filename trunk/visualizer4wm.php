@@ -105,7 +105,8 @@ function motionChart_generateJsFromContent($p_content)
 
 /**
  ** @brief motionChart only - Set the js and the html to be printed.
- ** @param $p_pageName
+ ** @param $p_pageName,
+ ** @param $p_displayedPageName,
  ** @param $p_projectUrl,
  ** @param $p_javaScriptRows,
  ** @param $p_groupName,
@@ -114,10 +115,8 @@ function motionChart_generateJsFromContent($p_content)
  ** @details Retrun an array of js and html.
  **
  */
-function motionChart_setJsAndHtml($p_pageName, $p_projectUrl, $p_javascriptRows, $p_groupName, $p_xAxisCaption, $p_yAxisCaption)
+function motionChart_setJsAndHtml($p_pageName, $p_displayedPageName, $p_projectUrl, $p_javascriptRows, $p_groupName, $p_xAxisCaption, $p_yAxisCaption)
 {
-  $p_displayedPageName = str_replace('_', ' ', $p_pageName);
-
   $l_htmlcode = <<<MYHMTLCODE
     <div id="chart_div"></div>
     <p></p>
@@ -197,10 +196,58 @@ function getDataLinesFromContent($p_content, $p_templateName)
 
 }
 
+
+function generateHtmlFromDataLines($p_dataLines)
+{
+
+  $p_htmlChart = "$p_dataLines[0]<br/>$p_dataLines[1]<br/><hr/>";
+
+  $l_data=getDataFromLines($p_dataLines);
+
+  return $p_htmlChart;
+
+}
+
 function getDataFromLines($p_dataLines)
 {
-  $l_dataLines = getDataLinesFromContent($p_content, $p_templateName);
-  return false;
+
+  $l_data=array();
+  //$l_wikiString="";
+  $l_lineIndex = 0;
+  foreach ($p_dataLines as $l_line)
+  {
+    if (""==$l_line) continue; // Empty lines are ignored.
+    $l_lineIndex += 1;
+
+    if ($l_lineIndex == 1) // First line.
+    {
+      $l_line = strstr($l_line, "}}"); // remove the template and its parameters.
+      if (false==$l_line) exit('Error: template ending code "}}" not found after the template opening.');
+      $l_line = substr($l_line, 2);
+
+      $l_data[$l_lineIndex] = explode("!!", $l_line);
+      if (count($l_data[$l_lineIndex]) < 1)
+      {
+	$l_data[$l_lineIndex] = explode("\n!", $l_line);
+	if (count($l_data[$l_lineIndex]) < 1) continue;
+      }
+
+      //$l_wikiString .= sprintf("First line: %s|%s|%s<br />\n", $l_data[$l_lineIndex][0], $l_data[$l_lineIndex][1], $l_data[$l_lineIndex][2]);
+
+    } 
+    else
+    {
+      $l_data[$l_lineIndex] = explode("||", $l_line);
+
+      if (count($l_data[$l_lineIndex]) < 1)
+      {
+	$l_data[$l_lineIndex] = explode("\n|", $l_line);
+      }
+      //$l_wikiString .= sprintf("  {{dataset|%s|%s|%s}}\n", $l_data[$l_lineIndex][0], $l_data[$l_lineIndex][1], $l_data[$l_lineIndex][2]);
+    }
+  }
+  //echo $l_wikiString."<br />End.";
+  return $l_data;
 }
 
 /**
@@ -316,7 +363,7 @@ function main()
     $l_xAxisCaption  = get("x",     "x axis");
     $l_yAxisCaption  = get("y",     "y axis");
     $l_groupName     = get("group", "Labels");
-    $l_jsHtml = motionChart_setJsAndHtml($l_pageName, $l_projectUrl, $l_javascriptRows, $l_groupName, $l_xAxisCaption, $l_yAxisCaption);
+    $l_jsHtml = motionChart_setJsAndHtml($l_pageName, $l_displayedPageName, $l_projectUrl, $l_javascriptRows, $l_groupName, $l_xAxisCaption, $l_yAxisCaption);
     printHTML($l_jsHtml['js'], $l_jsHtml['html']);
   }
   else
@@ -343,8 +390,11 @@ function main()
       exit("Sorry but the api \"$l_apiType\" is not valid.");
     }
     */
+  $l_htmlChart=generateHtmlFromDataLines($l_dataLines);
+
+
   $l_htmlcode = <<<MYHMTLCODE
-    <p>$l_dataLines[0]<br/>$l_dataLines[1]</p>
+    <p>$l_htmlChart</p>
     <div id="info" class="noLinkDecoration">
       Data source is
       <a href="http://$l_projectUrl/wiki/$l_pageName">$l_displayedPageName</a> on $l_projectUrl.

@@ -354,10 +354,8 @@ function main()
         $l_csvFile = manageUploadedFile('csvFile');
 				$l_csvContent = $l_csvFile['content'];
 				
-        $l_mediawikiContent = wikifyCsv($l_csvContent);
+        $l_PrintedContent = wikifyCsv($l_csvContent);
 
-        $l_PrintedContent =  str_replace("  ",'&nbsp;&nbsp;',$l_mediawikiContent);
-        $l_PrintedContent =  str_replace("\n",'<br />',$l_PrintedContent);
     }
     elseif( isset($_POST['upload2csv']) )
     {

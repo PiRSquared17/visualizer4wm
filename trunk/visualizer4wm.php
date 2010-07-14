@@ -156,7 +156,7 @@ MYJSCODE;
 
 
 /**
- ** @brief Return an array of data from the wiki source code
+ ** @brief Return an array of data lines from the wiki source code
  ** @param p_content source code of the wikipage (string)
  ** @param p_templateName template name
  ** @details
@@ -172,7 +172,7 @@ MYJSCODE;
  ** line[0]:  {{visualizer|text}} ! date !! A !! B !! C
  ** line[1]:  |2009/10/01 || 2464585 || 2325667 || 857585 
  */
-function getDataFromContent($p_content, $p_templateName)
+function getDataLinesFromContent($p_content, $p_templateName)
 {
 
     $l_tableContent = strstr($p_content, "{{".ucfirst($p_templateName));
@@ -197,6 +197,11 @@ function getDataFromContent($p_content, $p_templateName)
 
 }
 
+function getDataFromLines($p_dataLines)
+{
+  $l_dataLines = getDataLinesFromContent($p_content, $p_templateName);
+  return false;
+}
 
 /**
  ** @brief Print HTML
@@ -246,7 +251,6 @@ MYHMTLPAGE;
  */
 function main()
 {
-
   ini_set('user_agent', 'Al Maghi\'s visualizer4wm.php script');
 
   # Get the page name or print default html.
@@ -254,6 +258,7 @@ function main()
   if ("_"==$l_pageName || ""==$l_pageName) {
     exit(printHTML());
   }
+  $l_displayedPageName = str_replace('_',' ',$l_pageName);
 
   # Set the local parameters.
   $l_parameters = array(
@@ -266,8 +271,6 @@ function main()
 					  'wiktionary.org',
 					  'wikisource.org',
 					  'wikiversity.org'),
-
-    'templates'		=>	array('visualize', 'visualizer'),
 
      // Example types are found here: http://code.google.com/intl/fr-FR/apis/chart/docs/gallery/chart_gall.html
     'chart types'		=>	array('pie',
@@ -297,18 +300,12 @@ function main()
     exit("Sorry but <a href=\"http://$l_projectDomain\">$l_projectDomain</a> is not an authorised domain name. (Contact us if you want to authorise a new domain name.)<br />The <tt>project</tt> parameter should be something such as en.wikipedia.org.");
   }
 
-  # Get the template type and check it.
-  $l_templateType  = get("tpl", "visualize");
-  if ( !in_array( $l_templateType, $l_parameters['templates'])) {
-    exit("Sorry but the template parameter <tt>tpl=$l_templateType</tt> is not an authorised template.");
-  }
-
-
   # Try to get content from MediaWiki or exit.
   $l_pageContent = getContentFromMediaWiki($l_pageName,$l_projectUrl);
 
+  # Get the template name.
+  $l_templateType  = get("tpl", "visualize");
 
-  $l_displayedPageName = str_replace('_',' ',$l_pageName);
   # Generate the chart and print it.
   if ("visualize"==$l_templateType)
   {
@@ -325,7 +322,7 @@ function main()
   else
   {
     # Try to get data from content or return an error.
-    $l_dataLines = getDataFromContent($l_pageContent,$l_templateType);
+    $l_dataLines = getDataLinesFromContent($l_pageContent,$l_templateType);
     if ('error1'==$l_dataLines) {
       exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the string: <tt>{{Visualizer</tt><br />Check the template parameter <tt>tpl=$l_templateType</tt>");
     }

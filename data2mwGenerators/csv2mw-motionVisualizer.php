@@ -31,7 +31,7 @@ function printHTML($p_PrintedContent)
 		    <span class="info">The fifth column (<tt>group</tt>) is optional. If none, group value will be equal to id.</span>
 		    <span class="info">Semicolons can replace commas. Double quotes will be removed.</span>
 
-		    <form method="post" enctype="multipart/form-data" action="csv2mediawiki-forVisualizer.php">
+		    <form method="post" enctype="multipart/form-data" action="csv2mw-motionVisualizer.php">
 			    <p>
 			    <input type="file" name="csvFile" size="40" />
 			    <input type="submit" name="uploadcsv" value="Send csv file" />
@@ -47,7 +47,7 @@ function printHTML($p_PrintedContent)
 			december 2003, 921015,51621,54113,etc.
 		</div>
 
-		<form method="post" enctype="multipart/form-data" action="csv2mediawiki-forVisualizer.php">
+		<form method="post" enctype="multipart/form-data" action="csv2mw-motionVisualizer.php">
 		    <p>
 		    <span class="info">X axis data file: <input type="file" name="csvXFile" size="55" /></span>
 		    <span class="info">Y axis data file: <input type="file" name="csvYFile" size="55" /><input type="submit" name="upload2csv" value="Send two csv files" /></span>
@@ -72,42 +72,7 @@ function printHTML($p_PrintedContent)
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
     <title>cvs2visualize - Generate wikidata Visualizer</title>
-
-    <script type="text/javascript">
-    </script>
-
-    <style type="text/css">
-     div.pre {
-        margin:1em;
-	font-family: monospace, sans-serif;
-	background-color: #F9F9F9;
-	border: 1px dashed #2F6FAB;
-	color: black;
-	line-height: 1,1em;
-	padding: 1em;
-          user-select: text;
-	 -moz-user-select: text;
-	 -khtml-user-select: text;
-	 -webkit-user-select: text;
-	width:600px;
-     }
-     body {
-	background-color:lightgray;
-          user-select: none;
-	 -moz-user-select: none;
-	 -khtml-user-select: none;
-	 -webkit-user-select: none;
-	margin-left:1em;
-	}
-     span.info {
-	list-style-image: url(http://bits.wikimedia.org/skins-1.5/vector/images/bullet-icon.png?1);
-	list-style-type: square;
-	line-height: 1.5em;
-	display: list-item;
-	margin-left:2em;
-	}
-     div#mediawiki {width:600px;height:500px;overflow:auto;}
-    </style>
+    <link rel="stylesheet" href="./generators.css" type="text/css" media="screen" />
   </head>
 
   <body>

@@ -197,14 +197,51 @@ function getDataLinesFromContent($p_content, $p_templateName)
 }
 
 
-function generateHtmlFromDataLines($p_dataLines)
+function generateChartFromDataLines($p_dataLines,$p_ct)
 {
 
-  $p_htmlChart = "$p_dataLines[0]<br/>$p_dataLines[1]<br/><hr/>";
+  $l_htmlChart = "$p_dataLines[0]<br/>$p_dataLines[1]<br/><hr/>";
+
+  $l_htmlChart .= '<!--Div that will hold the pie chart-->
+    <div id="chart_div"></div>';
 
   $l_data=getDataFromLines($p_dataLines);
 
-  return $p_htmlChart;
+  $l_jsCode = <<<MYJSCODE
+ <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+    
+      // Load the Visualization API and the piechart package.
+      google.load('visualization', '1', {'packages':['piechart']});
+      
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.setOnLoadCallback(drawChart);
+      
+      // Callback that creates and populates a data table, 
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      function drawChart() {
+
+      // Create our data table.
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Task');
+        data.addColumn('number', 'Hours per Day');
+        data.addRows([
+          ['Work', 11],
+          ['Eat', 2],
+          ['Commute', 2],
+          ['Watch TV', 2],
+          ['Sleep', 7]
+        ]);
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+        chart.draw(data, {width: 400, height: 240, is3D: true, title: 'My Daily Activities'});
+      }
+    </script>
+MYJSCODE;
+
+  return array($l_jsCode, $l_htmlChart);
 
 }
 
@@ -377,23 +414,25 @@ function main()
       exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the line: <tt>|}</tt>");
     }
 
-    /*
+    
     # Get the chart type and check it.
     $l_chartType  = get("ct", "pie");
     if ( !in_array( $l_chartType, $l_parameters['chart types'])) {
       exit("Sorry but the chart type \"$l_chartType\" is not valid.");
     }
-
+    /*
     # Get the api and check if it handles the chart type.
     $l_apiType  = get("api", "gc");
     if ( !in_array( $l_apiType, $l_parameters['apis'])) {
       exit("Sorry but the api \"$l_apiType\" is not valid.");
-    }
-    */
-  $l_htmlChart=generateHtmlFromDataLines($l_dataLines);
+    }*/
 
+    $l_Chart=generateChartFromDataLines($l_dataLines, $l_chartType);
 
-  $l_htmlcode = <<<MYHMTLCODE
+    $l_htmlChart=$l_Chart[1];
+    $l_jscode=$l_Chart[0];
+
+    $l_htmlcode = <<<MYHMTLCODE
     <p>$l_htmlChart</p>
     <div id="info" class="noLinkDecoration">
       Data source is
@@ -401,7 +440,7 @@ function main()
     </div>
 MYHMTLCODE;
 
-    printHTML('',$l_htmlcode);
+    printHTML($l_jscode,$l_htmlcode);
   }
 }
 

@@ -2,7 +2,7 @@
 /** @file visualizer4wm.php
  ** @brief Visualize data published on a wikimedia project
  ** @details Visualize data using MediaWiki and charting APIs.
- ** It offers visualization of data published on a wikipage using {{visualize}} or {{visualizer}} templates.
+ ** It offers visualization of data published on a wikipage using some authorised templates.
  ** Authors include [[w:fr:User:Al Maghi]] and Xavier Marcelet.
  **/
 
@@ -12,7 +12,6 @@
  ** @param p_name name of arg
  ** @param p_default default value of arg
  ** @details get parameter from url arguments
- ** 
  */
 function get($p_name, $p_default=null)
 {
@@ -107,8 +106,8 @@ function motionChart_generateJsFromContent($p_content)
 /**
  ** @brief motionChart only - Set the js and the html to be printed.
  ** @param $p_pageName
- ** @param $p_javaScriptRows,
  ** @param $p_projectUrl,
+ ** @param $p_javaScriptRows,
  ** @param $p_groupName,
  ** @param $p_xAxisCaption,
  ** @param $p_yAxisCaption
@@ -309,13 +308,13 @@ function main()
   $l_pageContent = getContentFromMediaWiki($l_pageName,$l_projectUrl);
 
 
-
+  $l_displayedPageName = str_replace('_',' ',$l_pageName);
   # Generate the chart and print it.
   if ("motion"==$l_templateType)
   {
     $l_javascriptRows = motionChart_generateJsFromContent($l_pageContent);
     if (null==$l_javascriptRows) {
-      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_pageName</a> is not using correctly {{dataset}} and {{visualize}}.<br />Check the template parameter <tt>tpl=$l_templateType</tt>");
+      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> is not using correctly {{dataset}} and {{visualize}}.<br />Check the template parameter <tt>tpl=$l_templateType</tt>");
     }
     $l_xAxisCaption  = get("x",     "x axis");
     $l_yAxisCaption  = get("y",     "y axis");
@@ -328,10 +327,10 @@ function main()
     # Try to get data from content or return an error.
     $l_dataLines = getDataFromContent($l_pageContent,$l_templateType);
     if ('error1'==$l_dataLines) {
-      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_pageName</a> does not contain the string: <tt>{{Visualizer</tt><br />Check the template parameter <tt>tpl=$l_templateType</tt>");
+      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the string: <tt>{{Visualizer</tt><br />Check the template parameter <tt>tpl=$l_templateType</tt>");
     }
     if ('error2'==$l_dataLines) {
-      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_pageName</a> does not contain the line: <tt>|}</tt>");
+      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the line: <tt>|}</tt>");
     }
 
     /*
@@ -347,8 +346,15 @@ function main()
       exit("Sorry but the api \"$l_apiType\" is not valid.");
     }
     */
+  $l_htmlcode = <<<MYHMTLCODE
+    <p>$l_dataLines[0]<br/>$l_dataLines[1]</p>
+    <div id="info" class="noLinkDecoration">
+      Data source is
+      <a href="http://$l_projectUrl/wiki/$l_pageName">$l_displayedPageName</a> on $l_projectUrl.
+    </div>
+MYHMTLCODE;
 
-    printHTML('',"$l_dataLines[0]<br/>$l_dataLines[1]");
+    printHTML('',$l_htmlcode);
   }
 }
 

@@ -1,0 +1,30 @@
+div.pre {
+  margin:1em;
+  font-family: monospace, sans-serif;
+  background-color: #F9F9F9;
+  border: 1px dashed #2F6FAB;
+  color: black;
+  line-height: 1,1em;
+  padding: 1em;
+    user-select: text;
+    -moz-user-select: text;
+    -khtml-user-select: text;
+    -webkit-user-select: text;
+  width:600px;
+}
+body {
+  background-color:lightgray;
+    user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+  margin-left:1em;
+  }
+span.info {
+  list-style-image: url(http://bits.wikimedia.org/skins-1.5/vector/images/bullet-icon.png?1);
+  list-style-type: square;
+  line-height: 1.5em;
+  display: list-item;
+  margin-left:2em;
+  }
+div#mediawiki {width:600px;height:500px;overflow:auto;}

@@ -210,7 +210,7 @@ function printHTML($p_javaScriptCode="",
 {
 
   if (''==$p_htmlCode) {
-    $p_htmlCode='<div id="index">Welcome on this tool. It runs just as a proof of concept. <a href="?page=User:Al_Maghi/Visualize_Wikipedias_growth_up_to_2010&amp;project=en.wikipedia.org&amp;tpl=motion&amp;y=Bytes+per+article&amp;x=Articles&amp;group=Wikipedias">
+    $p_htmlCode='<div id="index">Welcome on this tool. It runs just as a proof of concept. <a href="?page=User:Al_Maghi/Visualize_Wikipedias_growth_up_to_2010&amp;project=en.wikipedia.org&amp;tpl=visualize&amp;y=Bytes+per+article&amp;x=Articles&amp;group=Wikipedias">
 		  See it in action</a>.</div>';
   }
 
@@ -267,7 +267,7 @@ function main()
 					  'wikisource.org',
 					  'wikiversity.org'),
 
-    'templates'		=>	array('motion', 'visualizer'),
+    'templates'		=>	array('visualize', 'visualizer'),
 
      // Example types are found here: http://code.google.com/intl/fr-FR/apis/chart/docs/gallery/chart_gall.html
     'chart types'		=>	array('pie',
@@ -298,7 +298,7 @@ function main()
   }
 
   # Get the template type and check it.
-  $l_templateType  = get("tpl", "motion");
+  $l_templateType  = get("tpl", "visualize");
   if ( !in_array( $l_templateType, $l_parameters['templates'])) {
     exit("Sorry but the template parameter <tt>tpl=$l_templateType</tt> is not an authorised template.");
   }
@@ -310,7 +310,7 @@ function main()
 
   $l_displayedPageName = str_replace('_',' ',$l_pageName);
   # Generate the chart and print it.
-  if ("motion"==$l_templateType)
+  if ("visualize"==$l_templateType)
   {
     $l_javascriptRows = motionChart_generateJsFromContent($l_pageContent);
     if (null==$l_javascriptRows) {

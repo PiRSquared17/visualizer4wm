@@ -106,28 +106,40 @@ function getWikiTableFromContent($p_content, $p_templateName)
  */
 function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
 {
-  //$l_htmlChart = "$p_dataLines[0]<br/>$p_dataLines[1]<br/><hr/>"; //debug
-
   # Get the data.
   $l_data=getDataFromTableLines($p_dataLines);
-
-  /*$l_htmlChart .= $l_data[0][0];
-  $l_htmlChart .="<br/>";
-  $l_htmlChart .= $l_data[0][1];
-  $l_htmlChart .="<br/>";
-  $l_htmlChart .= $l_data[1][0];
-  $l_htmlChart .="<br/>";
-  $l_htmlChart .= $l_data[1][1];
-  $l_htmlChart .="<hr/>";*/
 
   # Set the numbers of rows and cols.
   $l_nbOfRows = count($l_data);
   $l_nbOfCols = count($l_data[0]);
 
+$l_firstColType = 'string';
+$l_firstColSeparator = "'";
+
+  # Set the chart name.
+  switch ($p_ct) {
+      case "pie":
+	  $ChartType = 'PieChart';
+	  break;
+      case "bar":
+	  $ChartType = 'BarChart';
+	  break;
+      case "line":
+	  $ChartType = 'LineChart';
+	  break;
+      case "col":
+	  $ChartType = 'ColumnChart';
+	  break;
+      case "scatter":
+	  $ChartType = 'ScatterChart';
+	  $l_firstColType = 'number';
+	  $l_firstColSeparator = "";
+	  break;
+  }
 
   # Set the columns of data.
   $javascriptColumns = Array();
-  $jsCol = sprintf("data.addColumn('string', '%s')", trim($l_data[0][0]));
+  $jsCol = sprintf("data.addColumn('%s', '%s')", $l_firstColType, trim($l_data[0][0]));
   array_push($javascriptColumns, $jsCol);
   for ($i = 1; $i < $l_nbOfCols; $i++)
   {
@@ -145,7 +157,7 @@ function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
   for ($i = 1; $i < $l_nbOfRows; $i++)
   {
     $j = 0;
-    $jsRow = sprintf("data.setValue(%s, %s, '%s')", $i, $j, trim($l_data[$i][$j]) );
+    $jsRow = sprintf("data.setValue(%s, %s, %s%s%s)", $i, $j, $l_firstColSeparator, trim($l_data[$i][$j]), $l_firstColSeparator );
     array_push($javascriptRows, $jsRow);
 
     for ($j = 1; $j < $l_nbOfCols; $j++)
@@ -156,21 +168,6 @@ function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
   }
   $l_rows = implode(",\n", $javascriptRows);
 
-  # Set the chart name.
-  switch ($p_ct) {
-      case "pie":
-	  $ChartType = 'PieChart';
-	  break;
-      case "bar":
-	  $ChartType = 'BarChart';
-	  break;
-      case "line":
-	  $ChartType = 'LineChart';
-	  break;
-      case "col":
-	  $ChartType = 'ColumnChart';
-	  break;
-  }
 
   # Set the javaScript.
   $l_jsChart = <<<MYJSCODE
@@ -359,8 +356,12 @@ function printHTML($p_javaScriptCode="",
 		  pie</a>,
 	<a href="?page=Template:Visualizer&project=en.wikipedia.org&tpl=visualizer&ct=bar">
 		  bar</a>,
+	<a href="?page=Template:Visualizer/Test&project=en.wikipedia.org&tpl=visualizer&ct=col">
+		  column</a>,
 	<a href="?page=Template:Visualizer/Test&project=en.wikipedia.org&tpl=visualizer&ct=line">
-		  line</a> or
+		  line</a>,
+	<a href="?page=Template:Visualizer/Scatter&project=en.wikipedia.org&tpl=visualizer&ct=scatter">
+		  scatter</a> or
 	<a href="?page=User:Al_Maghi/Visualize_Wikipedias_growth_up_to_2010&amp;project=en.wikipedia.org&amp;tpl=visualize&amp;y=Bytes+per+article&amp;x=Articles&amp;group=Wikipedias">
 		  motion</a> charts.
       </div>';
@@ -419,7 +420,7 @@ function main()
 					  'wikisource.org',
 					  'wikiversity.org'),
 
-    'chart types'		=>	array('pie','bar', 'col', 'line'),
+    'chart types'		=>	array('pie','bar', 'col', 'line', 'scatter'),
   );
 
   # Get the project url and check its domain name.

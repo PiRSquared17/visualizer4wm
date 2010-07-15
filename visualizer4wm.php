@@ -221,15 +221,21 @@ function generateChartFromDataLines($p_dataLines,$p_ct, $p_displayedPageName)
   {
     $jsCol = sprintf("data.addColumn('number', '%s')", trim($l_data[0][$i]));
     array_push($javascriptColumns, $jsCol);
+
   }
   $l_cols = implode(";\n", $javascriptColumns).';';
 
 
   // Print the rows
-  $l_rows = "['Eat', 2, 1, 1],
-  ['Commute', 2, 1, 1],
-  ['Watch TV', 2, 1, 1],
-  ['Sleep', 7, 1, 1]";
+  $javascriptRows = Array();
+  for ($i = 1; $i < count($l_data); $i++)
+  {
+    $jsRow = sprintf("['%s', %s]", trim($l_data[$i][0]), trim($l_data[$i][1]) );
+    array_push($javascriptRows, $jsRow);
+
+  }
+  $l_rows = implode(",\n", $javascriptRows);
+
 
   $l_jsCode = <<<MYJSCODE
  <script type="text/javascript" src="http://www.google.com/jsapi"></script>

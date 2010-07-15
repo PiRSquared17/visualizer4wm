@@ -167,6 +167,9 @@ function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
       case "line":
 	  $ChartType = 'LineChart';
 	  break;
+      case "col":
+	  $ChartType = 'ColumnChart';
+	  break;
   }
 
   # Set the javaScript.
@@ -416,7 +419,7 @@ function main()
 					  'wikisource.org',
 					  'wikiversity.org'),
 
-    'chart types'		=>	array('pie','bar','line'),
+    'chart types'		=>	array('pie','bar', 'col', 'line'),
   );
 
   # Get the project url and check its domain name.

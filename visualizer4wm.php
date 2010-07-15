@@ -90,6 +90,11 @@ function getWikiTableFromContent($p_content, $p_templateName)
     }
     $l_tableContent=substr( $l_tableContent, 0, -strlen($l_endingContent) );
 
+    $l_tableContent=str_replace("[[","",$l_tableContent);
+    $l_tableContent=str_replace("]]","",$l_tableContent);
+    $l_tableContent=str_replace("'''","",$l_tableContent);
+    $l_tableContent=str_replace("''","",$l_tableContent);
+
     $l_line = explode("|-", $l_tableContent);
     return $l_line;
 

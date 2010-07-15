@@ -116,32 +116,36 @@ function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
 $l_firstColType = 'string';
 $l_firstColSeparator = "'";
 
-  # Set the chart name.
+  # Set the chart name and its axis.
   switch ($p_ct) {
       case "pie":
 	  $ChartType = 'PieChart';
 	  break;
       case "bar":
 	  $ChartType = 'BarChart';
-	  $p_vTitle=trim($l_data[0][0]);
-	  $p_hTitle=trim($l_data[0][1]);
-	  break;
-      case "line":
-	  $ChartType = 'LineChart';
-	  $p_hTitle=trim($l_data[0][0]);
-	  $p_vTitle=trim($l_data[0][1]);
 	  break;
       case "col":
 	  $ChartType = 'ColumnChart';
-	  $p_vTitle=trim($l_data[0][0]);
-	  $p_hTitle=trim($l_data[0][1]);
+	  break;
+      case "line":
+	  $ChartType = 'LineChart';
 	  break;
       case "scatter":
 	  $ChartType = 'ScatterChart';
 	  $l_firstColType = 'number';
 	  $l_firstColSeparator = "";
-	  $p_hTitle=trim($l_data[0][0]);
-	  $p_vTitle=trim($l_data[0][1]);
+	  $l_hTitle=trim($l_data[0][0]);
+	  $l_vTitle=trim($l_data[0][1]);
+	  $l_chartAxis =",
+		  hAxis: {title: '$l_hTitle'},
+		  vAxis: {title: '$l_vTitle'},
+		  legend: 'none'";
+	  break;
+      case "area":
+	  $ChartType = 'AreaChart';
+	  $l_hTitle=trim($l_data[0][0]);
+	  $l_chartAxis =",
+		    hAxis: {title: '$l_hTitle'}";
 	  break;
   }
 
@@ -159,7 +163,18 @@ $l_firstColSeparator = "'";
 
   # Set the rows of data.
   /*    data.setValue(0, 0, 'Work');
-        data.setValue(0, 1, 11); */
+        data.setValue(0, 1, 11); 
+
+[
+          ['2004', 1000, 400],
+          ['2005', 1170, 460],
+          ['2006', 660, 1120],
+          ['2007', 1030, 540]
+        ]
+
+
+
+*/
 
   $javascriptRows = Array();
   for ($i = 1; $i < $l_nbOfRows; $i++)
@@ -191,10 +206,7 @@ $l_firstColSeparator = "'";
 
         var chart = new google.visualization.$ChartType(document.getElementById('chart_div'));
         chart.draw(data, {width: 450, height: 300,
-			  title: '$p_chartTitle',
-			  hAxis: {title: '$p_hTitle'},
-			  vAxis: {title: '$p_vTitle'},
-                          legend: 'none'
+			  title: '$p_chartTitle'$l_chartAxis
 			  });
       }
     </script>
@@ -398,7 +410,7 @@ function printHTML($p_javaScriptCode="",
     	<tt>{{<a href="http://meta.wikipedia.org/wiki/visualizer4wm">Visualizer</a>}}</tt> &nbsp;
       &#8734; &nbsp; The data visualizer tool is kindly served to you by the <span class="hidden"><a href="http://toolserver.org/">Wikimedia Toolserver</a>.
       	It uses the <a href="http://mediawiki.org/wiki/API">MediaWiki</a>
-      	and the <a href="http://code.google.com/intl/fr-FR/apis/visualization/documentation/gallery/motionchart.html">Vizualisation</a></span> APIs.
+      	and the <a href="http://code.google.com/intl/fr-FR/apis/visualization/interactive_charts.html">Vizualisation</a></span> APIs.
     </div>
   </body>
 </html>
@@ -433,7 +445,7 @@ function main()
 					  'wikisource.org',
 					  'wikiversity.org'),
 
-    'chart types'		=>	array('pie','bar', 'col', 'line', 'scatter'),
+    'chart types'		=>	array('pie','bar', 'col', 'line', 'scatter', 'area'),
   );
 
   # Get the project url and check its domain name.

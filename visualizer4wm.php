@@ -377,15 +377,15 @@ function printHTML($p_javaScriptCode="",
   if (''==$p_htmlCode) {
     $p_htmlCode='<div id="index">Welcome on the visualizer tool.<br /> 
 		  See it in action with
-	<a href="?page=Template:Visualizer&project=en.wikipedia.org&tpl=visualizer&ct=pie">
+	<a href="?page=Template:Visualizer&amp;project=en.wikipedia.org&amp;tpl=visualizer&amp;ct=pie">
 		  pie</a>,
-	<a href="?page=Template:Visualizer&project=en.wikipedia.org&tpl=visualizer&ct=bar">
+	<a href="?page=Template:Visualizer&amp;project=en.wikipedia.org&amp;tpl=visualizer&amp;ct=bar">
 		  bar</a>,
-	<a href="?page=Template:Visualizer/Test&project=en.wikipedia.org&tpl=visualizer&ct=col">
+	<a href="?page=Template:Visualizer/Test&amp;project=en.wikipedia.org&amp;tpl=visualizer&amp;ct=col">
 		  column</a>,
-	<a href="?page=Template:Visualizer/Test&project=en.wikipedia.org&tpl=visualizer&ct=line">
+	<a href="?page=Template:Visualizer/Test&amp;project=en.wikipedia.org&amp;tpl=visualizer&amp;ct=line">
 		  line</a>,
-	<a href="?page=Template:Visualizer/Scatter&project=en.wikipedia.org&tpl=visualizer&ct=scatter">
+	<a href="?page=Template:Visualizer/Scatter&amp;project=en.wikipedia.org&amp;tpl=visualizer&amp;ct=scatter">
 		  scatter</a> or
 	<a href="?page=User:Al_Maghi/Visualize_Wikipedias_growth_up_to_2010&amp;project=en.wikipedia.org&amp;tpl=visualize&amp;y=Bytes+per+article&amp;x=Articles&amp;group=Wikipedias">
 		  motion</a> charts.

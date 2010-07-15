@@ -339,8 +339,15 @@ function printHTML($p_javaScriptCode="",
 {
 
   if (''==$p_htmlCode) {
-    $p_htmlCode='<div id="index">Welcome on this tool. It runs just as a proof of concept. <a href="?page=User:Al_Maghi/Visualize_Wikipedias_growth_up_to_2010&amp;project=en.wikipedia.org&amp;tpl=visualize&amp;y=Bytes+per+article&amp;x=Articles&amp;group=Wikipedias">
-		  See it in action</a>.</div>';
+    $p_htmlCode='<div id="index">Welcome on the visualizer tool.<br /> 
+		  See it in action with
+	<a href="?page=Template:Visualizer&project=en.wikipedia.org&tpl=visualizer&ct=pie">
+		  pie</a>,
+	<a href="?page=Template:Visualizer&project=en.wikipedia.org&tpl=visualizer&ct=bar">
+		  bar</a> or
+	<a href="?page=User:Al_Maghi/Visualize_Wikipedias_growth_up_to_2010&amp;project=en.wikipedia.org&amp;tpl=visualize&amp;y=Bytes+per+article&amp;x=Articles&amp;group=Wikipedias">
+		  motion</a> charts.
+      </div>';
   }
 
   header('Content-type: text/html; charset=UTF-8');

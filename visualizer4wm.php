@@ -197,15 +197,40 @@ function getDataLinesFromContent($p_content, $p_templateName)
 }
 
 
-function generateChartFromDataLines($p_dataLines,$p_ct)
+function generateChartFromDataLines($p_dataLines,$p_ct, $p_displayedPageName)
 {
 
-  $l_htmlChart = "$p_dataLines[0]<br/>$p_dataLines[1]<br/><hr/>";
-
-  $l_htmlChart .= '<!--Div that will hold the pie chart-->
-    <div id="chart_div"></div>';
+  $l_htmlChart = "$p_dataLines[0]<br/>$p_dataLines[1]<br/><hr/>"; //debug
 
   $l_data=getDataFromLines($p_dataLines);
+
+  $l_htmlChart .= $l_data[0][0];
+  $l_htmlChart .="<br/>";
+  $l_htmlChart .= $l_data[0][1];
+  $l_htmlChart .="<br/>";
+  $l_htmlChart .= $l_data[1][0];
+  $l_htmlChart .="<br/>";
+  $l_htmlChart .= $l_data[1][1];
+  $l_htmlChart .="<hr/>";
+
+  // Print the columns
+  $javascriptColumns = Array();
+  $jsCol = sprintf("data.addColumn('string', '%s')", trim($l_data[0][0]));
+  array_push($javascriptColumns, $jsCol);
+  for ($i = 1; $i < count($l_data[0]); $i++)
+  {
+    $jsCol = sprintf("data.addColumn('number', '%s')", trim($l_data[0][$i]));
+    array_push($javascriptColumns, $jsCol);
+  }
+  $l_cols = implode(";\n", $javascriptColumns);
+
+
+  // Print the rows
+  $l_rows = "
+  ['Eat', 2, 1, 1],
+  ['Commute', 2, 1, 1],
+  ['Watch TV', 2, 1, 1],
+  ['Sleep', 7, 1, 1]";
 
   $l_jsCode = <<<MYJSCODE
  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
@@ -224,22 +249,20 @@ function generateChartFromDataLines($p_dataLines,$p_ct)
 
       // Create our data table.
         var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Task');
-        data.addColumn('number', 'Hours per Day');
+	$l_cols
         data.addRows([
-          ['Work', 11],
-          ['Eat', 2],
-          ['Commute', 2],
-          ['Watch TV', 2],
-          ['Sleep', 7]
+	  $l_rows
         ]);
 
         // Instantiate and draw our chart, passing in some options.
         var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
-        chart.draw(data, {width: 400, height: 240, is3D: true, title: 'My Daily Activities'});
+        chart.draw(data, {width: 400, height: 240, is3D: true, title: '$p_displayedPageName'});
       }
     </script>
 MYJSCODE;
+
+  $l_htmlChart .= '<!--Div that will hold the pie chart-->
+    <div id="chart_div"></div>';
 
   return array($l_jsCode, $l_htmlChart);
 
@@ -250,13 +273,13 @@ function getDataFromLines($p_dataLines)
 
   $l_data=array();
   //$l_wikiString="";
-  $l_lineIndex = 0;
+  $l_lineIndex = -1;
   foreach ($p_dataLines as $l_line)
   {
     if (""==$l_line) continue; // Empty lines are ignored.
     $l_lineIndex += 1;
 
-    if ($l_lineIndex == 1) // First line.
+    if ($l_lineIndex == 0) // First line.
     {
       $l_line = strstr($l_line, "}}"); // remove the template and its parameters.
       if (false==$l_line) exit('Error: template ending code "}}" not found after the template opening.');
@@ -427,7 +450,7 @@ function main()
       exit("Sorry but the api \"$l_apiType\" is not valid.");
     }*/
 
-    $l_Chart=generateChartFromDataLines($l_dataLines, $l_chartType);
+    $l_Chart=generateChartFromDataLines($l_dataLines, $l_chartType, $l_displayedPageName);
 
     $l_htmlChart=$l_Chart[1];
     $l_jscode=$l_Chart[0];

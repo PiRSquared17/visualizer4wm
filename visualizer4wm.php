@@ -54,6 +54,190 @@ function getContentFromMediaWiki ($p_pageName,$p_projectUrl)
 
 
 /**
+ ** @brief Return an array of the wikitable lines from the wiki source code
+ ** @param p_content source code of the wikipage (string)
+ ** @param p_templateName template name
+ ** @details
+ ** {|
+ ** |+ text {{visualizer| }}
+ ** ! en !! 2003/0/1 !! East
+ ** |-
+ ** | dataset || 68465 || 26843 
+ ** |}
+ **
+ ** -> to
+ **
+ ** line[0]:  {{visualizer|text}} ! date !! A !! B !! C
+ ** line[1]:  |2009/10/01 || 2464585 || 2325667 || 857585 
+ */
+function getWikiTableFromContent($p_content, $p_templateName)
+{
+
+    $l_tableContent = strstr($p_content, "{{".ucfirst($p_templateName));
+    if (false==$l_tableContent)
+    {
+      $l_tableContent = strstr($p_content, "{{".lcfirst($p_templateName));
+    }
+    if (false==$l_tableContent)
+    {
+      return "error1";
+    }
+
+    $l_endingContent = strstr( $l_tableContent, "\n|}");
+    if (false==$l_endingContent)
+    {
+       return "error2";
+    }
+    $l_tableContent=substr( $l_tableContent, 0, -strlen($l_endingContent) );
+
+    $l_line = explode("|-", $l_tableContent);
+    return $l_line;
+
+}
+
+
+/**
+ ** @brief generateChartFromTableLines
+ ** @param $p_dataLines Array of lines,
+ ** @param $p_ct Chart type,
+ ** @param $p_displayedPageName Page name,
+ ** @details Returns an array of the data.
+ **
+ */
+function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
+{
+  //$l_htmlChart = "$p_dataLines[0]<br/>$p_dataLines[1]<br/><hr/>"; //debug
+
+  # Get the data.
+  $l_data=getDataFromTableLines($p_dataLines);
+
+  /*$l_htmlChart .= $l_data[0][0];
+  $l_htmlChart .="<br/>";
+  $l_htmlChart .= $l_data[0][1];
+  $l_htmlChart .="<br/>";
+  $l_htmlChart .= $l_data[1][0];
+  $l_htmlChart .="<br/>";
+  $l_htmlChart .= $l_data[1][1];
+  $l_htmlChart .="<hr/>";*/
+
+  # Set the numbers of rows and cols.
+  $l_nbOfRows = count($l_data);
+  $l_nbOfCols = count($l_data[0]);
+
+
+  # Set the columns of data.
+  $javascriptColumns = Array();
+  $jsCol = sprintf("data.addColumn('string', '%s')", trim($l_data[0][0]));
+  array_push($javascriptColumns, $jsCol);
+  for ($i = 1; $i < $l_nbOfCols; $i++)
+  {
+    $jsCol = sprintf("data.addColumn('number', '%s')", trim($l_data[0][$i]));
+    array_push($javascriptColumns, $jsCol);
+
+  }
+  $l_cols = implode(";\n", $javascriptColumns).';';
+
+  # Set the rows of data.
+  /*    data.setValue(0, 0, 'Work');
+        data.setValue(0, 1, 11); */
+
+  $javascriptRows = Array();
+  for ($i = 1; $i < $l_nbOfRows; $i++)
+  {
+    $j = 0;
+    $jsRow = sprintf("data.setValue(%s, %s, '%s')", $i, $j, trim($l_data[$i][$j]) );
+    array_push($javascriptRows, $jsRow);
+
+    for ($j = 1; $j < $l_nbOfCols; $j++)
+    {
+    $jsRow = sprintf("data.setValue(%s, %s, %s)", $i, $j, trim($l_data[$i][$j]) );
+    array_push($javascriptRows, $jsRow);
+    }
+  }
+  $l_rows = implode(",\n", $javascriptRows);
+
+  # Set the chart name.
+  switch ($p_ct) {
+      case "pie":
+	  $ChartType = 'PieChart';
+	  break;
+      case "bar":
+	  $ChartType = 'BarChart';
+	  break;
+      case "line":
+	  $ChartType = 'LineChart';
+	  break;
+  }
+
+  # Set the javaScript.
+  $l_jsChart = <<<MYJSCODE
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = new google.visualization.DataTable();
+        $l_cols
+        data.addRows($l_nbOfRows);
+	$l_rows
+
+        var chart = new google.visualization.$ChartType(document.getElementById('chart_div'));
+        chart.draw(data, {width: 450, height: 300, title: '$p_chartTitle'});
+      }
+    </script>
+MYJSCODE;
+
+  # Set the html.
+  $l_htmlChart = '<div id="chart_div"></div>';
+
+  return array($l_jsChart, $l_htmlChart);
+
+}
+
+/**
+ ** @brief getDataFromTableLines
+ ** @param $p_dataLines
+ ** @details Returns an array of the data.
+ **
+ */
+function getDataFromTableLines($p_dataLines)
+{
+  $l_data=array();
+  $l_lineIndex = -1;
+  foreach ($p_dataLines as $l_line)
+  {
+    if (""==$l_line) continue; // Empty lines are ignored.
+    $l_lineIndex += 1;
+
+    if ($l_lineIndex == 0) // First line.
+    {
+      $l_line = strstr($l_line, "}}"); // remove the template and its parameters.
+      if (false==$l_line) exit('Error: template ending code "}}" not found after the template opening.');
+      $l_line = substr($l_line, 2);
+
+      $l_line=substr(trim($l_line),1);
+      $l_data[$l_lineIndex] = explode("!!", $l_line);
+      if (count($l_data[$l_lineIndex]) < 2)
+      {
+	$l_data[$l_lineIndex] = explode("\n!", $l_line);
+	if (count($l_data[$l_lineIndex]) < 2) continue;
+      }
+    } 
+    else
+    {
+      $l_line=substr(trim($l_line),1);
+      $l_data[$l_lineIndex] = explode("||", $l_line);
+      if (count($l_data[$l_lineIndex]) < 2)
+      {
+	$l_data[$l_lineIndex] = explode("\n|", $l_line);
+      }
+    }
+  }
+  return $l_data;
+}
+
+
+/**
  ** @brief motionChart only - Return javascript rows of data
  ** @param $p_content page content
  ** @details
@@ -155,189 +339,6 @@ MYJSCODE;
 
 
 /**
- ** @brief Return an array of data lines from the wiki source code
- ** @param p_content source code of the wikipage (string)
- ** @param p_templateName template name
- ** @details
- ** {|
- ** |+ text {{visualizer| }}
- ** ! en !! 2003/0/1 !! East
- ** |-
- ** | dataset || 68465 || 26843 
- ** |}
- **
- ** -> to
- **
- ** line[0]:  {{visualizer|text}} ! date !! A !! B !! C
- ** line[1]:  |2009/10/01 || 2464585 || 2325667 || 857585 
- */
-function getDataLinesFromContent($p_content, $p_templateName)
-{
-
-    $l_tableContent = strstr($p_content, "{{".ucfirst($p_templateName));
-    if (false==$l_tableContent)
-    {
-      $l_tableContent = strstr($p_content, "{{".lcfirst($p_templateName));
-    }
-    if (false==$l_tableContent)
-    {
-      return "error1";
-    }
-
-    $l_endingContent = strstr( $l_tableContent, "\n|}");
-    if (false==$l_endingContent)
-    {
-       return "error2";
-    }
-    $l_tableContent=substr( $l_tableContent, 0, -strlen($l_endingContent) );
-
-    $l_line = explode("|-", $l_tableContent);
-    return $l_line;
-
-}
-
-
-/**
- ** @brief generateChartFromDataLines
- ** @param $p_dataLines Array of lines,
- ** @param $p_ct Chart type,
- ** @param $p_displayedPageName Page name,
- ** @details Returns an array of the data.
- **
- */
-function generateChartFromDataLines($p_dataLines,$p_ct, $p_chartTitle)
-{
-  //$l_htmlChart = "$p_dataLines[0]<br/>$p_dataLines[1]<br/><hr/>"; //debug
-
-  # Get the data.
-  $l_data=getDataFromLines($p_dataLines);
-
-  /*$l_htmlChart .= $l_data[0][0];
-  $l_htmlChart .="<br/>";
-  $l_htmlChart .= $l_data[0][1];
-  $l_htmlChart .="<br/>";
-  $l_htmlChart .= $l_data[1][0];
-  $l_htmlChart .="<br/>";
-  $l_htmlChart .= $l_data[1][1];
-  $l_htmlChart .="<hr/>";*/
-
-  # Set the numbers of rows and cols.
-  $l_nbOfRows = count($l_data);
-  $l_nbOfCols = count($l_data[0]);
-
-
-  # Set the columns of data.
-  $javascriptColumns = Array();
-  $jsCol = sprintf("data.addColumn('string', '%s')", trim($l_data[0][0]));
-  array_push($javascriptColumns, $jsCol);
-  for ($i = 1; $i < $l_nbOfCols; $i++)
-  {
-    $jsCol = sprintf("data.addColumn('number', '%s')", trim($l_data[0][$i]));
-    array_push($javascriptColumns, $jsCol);
-
-  }
-  $l_cols = implode(";\n", $javascriptColumns).';';
-
-  # Set the rows of data.
-  /*    data.setValue(0, 0, 'Work');
-        data.setValue(0, 1, 11); */
-
-  $javascriptRows = Array();
-  for ($i = 1; $i < $l_nbOfRows; $i++)
-  {
-    $j = 0;
-    $jsRow = sprintf("data.setValue(%s, %s, '%s')", $i, $j, trim($l_data[$i][$j]) );
-    array_push($javascriptRows, $jsRow);
-
-    for ($j = 1; $j < $l_nbOfCols; $j++)
-    {
-    $jsRow = sprintf("data.setValue(%s, %s, %s)", $i, $j, trim($l_data[$i][$j]) );
-    array_push($javascriptRows, $jsRow);
-    }
-  }
-  $l_rows = implode(",\n", $javascriptRows);
-
-  # Set the chart name.
-  switch ($p_ct) {
-      case "pie":
-	  $ChartType = 'PieChart';
-	  break;
-      case "bar":
-	  $ChartType = 'BarChart';
-	  break;
-      case "line":
-	  $ChartType = 'LineChart';
-	  break;
-  }
-
-  # Set the javaScript.
-  $l_jsChart = <<<MYJSCODE
-    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-    <script type="text/javascript">
-      google.load("visualization", "1", {packages:["corechart"]});
-      google.setOnLoadCallback(drawChart);
-      function drawChart() {
-        var data = new google.visualization.DataTable();
-        $l_cols
-        data.addRows($l_nbOfRows);
-	$l_rows
-
-        var chart = new google.visualization.$ChartType(document.getElementById('chart_div'));
-        chart.draw(data, {width: 450, height: 300, title: '$p_chartTitle'});
-      }
-    </script>
-MYJSCODE;
-
-  # Set the html.
-  $l_htmlChart = '<div id="chart_div"></div>';
-
-  return array($l_jsChart, $l_htmlChart);
-
-}
-
-/**
- ** @brief getDataFromLines
- ** @param $p_dataLines
- ** @details Returns an array of the data.
- **
- */
-function getDataFromLines($p_dataLines)
-{
-  $l_data=array();
-  $l_lineIndex = -1;
-  foreach ($p_dataLines as $l_line)
-  {
-    if (""==$l_line) continue; // Empty lines are ignored.
-    $l_lineIndex += 1;
-
-    if ($l_lineIndex == 0) // First line.
-    {
-      $l_line = strstr($l_line, "}}"); // remove the template and its parameters.
-      if (false==$l_line) exit('Error: template ending code "}}" not found after the template opening.');
-      $l_line = substr($l_line, 2);
-
-      $l_line=substr(trim($l_line),1);
-      $l_data[$l_lineIndex] = explode("!!", $l_line);
-      if (count($l_data[$l_lineIndex]) < 2)
-      {
-	$l_data[$l_lineIndex] = explode("\n!", $l_line);
-	if (count($l_data[$l_lineIndex]) < 2) continue;
-      }
-    } 
-    else
-    {
-      $l_line=substr(trim($l_line),1);
-      $l_data[$l_lineIndex] = explode("||", $l_line);
-      if (count($l_data[$l_lineIndex]) < 2)
-      {
-	$l_data[$l_lineIndex] = explode("\n|", $l_line);
-      }
-    }
-  }
-  return $l_data;
-}
-
-/**
  ** @brief Print HTML
  ** @param $p_javaScriptCode 
  ** @param $p_htmlCode 
@@ -415,25 +416,7 @@ function main()
 					  'wikisource.org',
 					  'wikiversity.org'),
 
-    'chart types'		=>	array('pie','bar', 'line'
-     /* // Example types are found here: http://code.google.com/intl/fr-FR/apis/chart/docs/gallery/chart_gall.html
-					  // Bars
-					  , 'bhs', 'bvs', 'bhg', 'bvg', 'bvo',
-					  // Lines
-					  'lines',
-					  // Venne
-					  'venne',
-					  // Motion
-					  'gglemotion',*/
-					),
-    /*'apis'			=>	array(
-					    // Google Chart image api
-					    'gc',
-					    // Google Visualization interactive api
-					    'gv', 'corechart'
-					    // PHP chart api
-					    'pchart',
-					 ),*/
+    'chart types'		=>	array('pie','bar', 'line'),
   );
 
   # Get the project url and check its domain name.
@@ -465,7 +448,7 @@ function main()
   else
   {
     # Try to get data from content or return an error.
-    $l_dataLines = getDataLinesFromContent($l_pageContent,$l_templateType);
+    $l_dataLines = getTableLinesFromContent($l_pageContent,$l_templateType);
     if ('error1'==$l_dataLines) {
       exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the string: <tt>{{Visualizer</tt><br />Check the template parameter <tt>tpl=$l_templateType</tt>");
     }
@@ -479,8 +462,11 @@ function main()
       exit("Sorry but the chart type \"$l_chartType\" is not valid.");
     }
 
+    # Get the chart title.
+    $l_chartTitle  = get("title", $l_displayedPageName);
+
     # Generate the chart js and html.   
-    $l_Chart=generateChartFromDataLines($l_dataLines, $l_chartType, $l_displayedPageName);
+    $l_Chart=generateChartFromTableLines($l_dataLines, $l_chartType, $l_chartTitle);
 
     $l_htmlChart=$l_Chart[1];
     $l_jscode=$l_Chart[0];

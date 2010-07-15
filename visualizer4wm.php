@@ -250,6 +250,15 @@ function generateChartFromDataLines($p_dataLines,$p_ct, $p_displayedPageName)
   }
   $l_rows = implode(",\n", $javascriptRows);
 
+  switch ($p_ct) {
+      case "pie":
+	  $ChartType = 'PieChart';
+	  break;
+      case "bar":
+	  $ChartType = 'BarChart';
+	  break;
+  }
+ 
 
   $l_jsCode = <<<MYJSCODE
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
@@ -262,7 +271,7 @@ function generateChartFromDataLines($p_dataLines,$p_ct, $p_displayedPageName)
         data.addRows($l_nbOfRows);
 	$l_rows
 
-        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+        var chart = new google.visualization.$ChartType(document.getElementById('chart_div'));
         chart.draw(data, {width: 450, height: 300, title: '$p_displayedPageName'});
       }
     </script>
@@ -387,8 +396,8 @@ function main()
 					  'wikisource.org',
 					  'wikiversity.org'),
 
-     // Example types are found here: http://code.google.com/intl/fr-FR/apis/chart/docs/gallery/chart_gall.html
-    'chart types'		=>	array('pie',
+    'chart types'		=>	array('pie','bar',
+     /* // Example types are found here: http://code.google.com/intl/fr-FR/apis/chart/docs/gallery/chart_gall.html
 					  // Bars
 					  'bhs', 'bvs', 'bhg', 'bvg', 'bvo',
 					  // Lines
@@ -396,16 +405,16 @@ function main()
 					  // Venne
 					  'venne',
 					  // Motion
-					  'gglemotion',
+					  'gglemotion',*/
 					),
-    'apis'			=>	array(
+    /*'apis'			=>	array(
 					    // Google Chart image api
 					    'gc',
 					    // Google Visualization interactive api
 					    'gv',
 					    // PHP chart api
 					    'pchart',
-					 ),
+					 ),*/
   );
 
   # Get the project url and check its domain name.

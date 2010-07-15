@@ -416,7 +416,7 @@ function main()
 					  'wikisource.org',
 					  'wikiversity.org'),
 
-    'chart types'		=>	array('pie','bar', 'line'),
+    'chart types'		=>	array('pie','bar','line'),
   );
 
   # Get the project url and check its domain name.
@@ -448,7 +448,7 @@ function main()
   else
   {
     # Try to get data from content or return an error.
-    $l_dataLines = getTableLinesFromContent($l_pageContent,$l_templateType);
+    $l_dataLines = getWikiTableFromContent($l_pageContent,$l_templateType);
     if ('error1'==$l_dataLines) {
       exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the string: <tt>{{Visualizer</tt><br />Check the template parameter <tt>tpl=$l_templateType</tt>");
     }
@@ -463,7 +463,7 @@ function main()
     }
 
     # Get the chart title.
-    $l_chartTitle  = get("title", $l_displayedPageName);
+    $l_chartTitle = get("title", $l_displayedPageName);
 
     # Generate the chart js and html.   
     $l_Chart=generateChartFromTableLines($l_dataLines, $l_chartType, $l_chartTitle);

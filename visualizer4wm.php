@@ -255,6 +255,9 @@ function generateChartFromDataLines($p_dataLines,$p_ct, $p_chartTitle)
       case "bar":
 	  $ChartType = 'BarChart';
 	  break;
+      case "line":
+	  $ChartType = 'LineChart';
+	  break;
   }
 
   # Set the number of rows.
@@ -342,7 +345,9 @@ function printHTML($p_javaScriptCode="",
 	<a href="?page=Template:Visualizer&project=en.wikipedia.org&tpl=visualizer&ct=pie">
 		  pie</a>,
 	<a href="?page=Template:Visualizer&project=en.wikipedia.org&tpl=visualizer&ct=bar">
-		  bar</a> or
+		  bar</a>,
+	<a href="?page=Template:Visualizer&project=en.wikipedia.org&tpl=visualizer&ct=line">
+		  line</a> or
 	<a href="?page=User:Al_Maghi/Visualize_Wikipedias_growth_up_to_2010&amp;project=en.wikipedia.org&amp;tpl=visualize&amp;y=Bytes+per+article&amp;x=Articles&amp;group=Wikipedias">
 		  motion</a> charts.
       </div>';
@@ -401,10 +406,10 @@ function main()
 					  'wikisource.org',
 					  'wikiversity.org'),
 
-    'chart types'		=>	array('pie','bar',
+    'chart types'		=>	array('pie','bar', 'line'
      /* // Example types are found here: http://code.google.com/intl/fr-FR/apis/chart/docs/gallery/chart_gall.html
 					  // Bars
-					  'bhs', 'bvs', 'bhg', 'bvg', 'bvo',
+					  , 'bhs', 'bvs', 'bhg', 'bvg', 'bvo',
 					  // Lines
 					  'lines',
 					  // Venne
@@ -416,7 +421,7 @@ function main()
 					    // Google Chart image api
 					    'gc',
 					    // Google Visualization interactive api
-					    'gv',
+					    'gv', 'corechart'
 					    // PHP chart api
 					    'pchart',
 					 ),*/
@@ -459,19 +464,13 @@ function main()
       exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the line: <tt>|}</tt>");
     }
 
-    
     # Get the chart type and check it.
     $l_chartType  = get("ct", "pie");
     if ( !in_array( $l_chartType, $l_parameters['chart types'])) {
       exit("Sorry but the chart type \"$l_chartType\" is not valid.");
     }
-    /*
-    # Get the api and check if it handles the chart type.
-    $l_apiType  = get("api", "gc");
-    if ( !in_array( $l_apiType, $l_parameters['apis'])) {
-      exit("Sorry but the api \"$l_apiType\" is not valid.");
-    }*/
 
+    # Generate the chart js and html.   
     $l_Chart=generateChartFromDataLines($l_dataLines, $l_chartType, $l_displayedPageName);
 
     $l_htmlChart=$l_Chart[1];

@@ -123,17 +123,25 @@ $l_firstColSeparator = "'";
 	  break;
       case "bar":
 	  $ChartType = 'BarChart';
+	  $p_vTitle=trim($l_data[0][0]);
+	  $p_hTitle=trim($l_data[0][1]);
 	  break;
       case "line":
 	  $ChartType = 'LineChart';
+	  $p_hTitle=trim($l_data[0][0]);
+	  $p_vTitle=trim($l_data[0][1]);
 	  break;
       case "col":
 	  $ChartType = 'ColumnChart';
+	  $p_vTitle=trim($l_data[0][0]);
+	  $p_hTitle=trim($l_data[0][1]);
 	  break;
       case "scatter":
 	  $ChartType = 'ScatterChart';
 	  $l_firstColType = 'number';
 	  $l_firstColSeparator = "";
+	  $p_hTitle=trim($l_data[0][0]);
+	  $p_vTitle=trim($l_data[0][1]);
 	  break;
   }
 
@@ -182,7 +190,12 @@ $l_firstColSeparator = "'";
 	$l_rows
 
         var chart = new google.visualization.$ChartType(document.getElementById('chart_div'));
-        chart.draw(data, {width: 450, height: 300, title: '$p_chartTitle'});
+        chart.draw(data, {width: 450, height: 300,
+			  title: '$p_chartTitle',
+			  hAxis: {title: '$p_hTitle'},
+			  vAxis: {title: '$p_vTitle'},
+                          legend: 'none'
+			  });
       }
     </script>
 MYJSCODE;

@@ -110,7 +110,7 @@ function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
   $l_data=getDataFromTableLines($p_dataLines);
 
   # Set the numbers of rows and cols.
-  $l_nbOfRows = count($l_data);
+  $l_nbOfRows = count($l_data)-1;
   $l_nbOfCols = count($l_data[0]);
 
 $l_firstColType = 'string';
@@ -162,34 +162,21 @@ $l_firstColSeparator = "'";
   $l_cols = implode(";\n", $javascriptColumns).';';
 
   # Set the rows of data.
-  /*    data.setValue(0, 0, 'Work');
-        data.setValue(0, 1, 11); 
-
-[
-          ['2004', 1000, 400],
-          ['2005', 1170, 460],
-          ['2006', 660, 1120],
-          ['2007', 1030, 540]
-        ]
-
-
-
-*/
 
   $javascriptRows = Array();
-  for ($i = 1; $i < $l_nbOfRows; $i++)
+  for ($i = 0; $i < $l_nbOfRows; $i++)
   {
     $j = 0;
-    $jsRow = sprintf("data.setValue(%s, %s, %s%s%s)", $i, $j, $l_firstColSeparator, trim($l_data[$i][$j]), $l_firstColSeparator );
+    $jsRow = sprintf("data.setValue(%s, %s, %s%s%s)", $i, $j, $l_firstColSeparator, trim($l_data[$i+1][$j]), $l_firstColSeparator );
     array_push($javascriptRows, $jsRow);
 
     for ($j = 1; $j < $l_nbOfCols; $j++)
     {
-    $jsRow = sprintf("data.setValue(%s, %s, %s)", $i, $j, trim($l_data[$i][$j]) );
+    $jsRow = sprintf("data.setValue(%s, %s, %s)", $i, $j, trim($l_data[$i+1][$j]) );
     array_push($javascriptRows, $jsRow);
     }
   }
-  $l_rows = implode(",\n", $javascriptRows);
+  $l_rows = implode(";\n", $javascriptRows).";";
 
 
   # Set the javaScript.
@@ -386,7 +373,9 @@ function printHTML($p_javaScriptCode="",
 	<a href="?page=Template:Visualizer/Test&amp;project=en.wikipedia.org&amp;tpl=visualizer&amp;ct=line">
 		  line</a>,
 	<a href="?page=Template:Visualizer/Scatter&amp;project=en.wikipedia.org&amp;tpl=visualizer&amp;ct=scatter">
-		  scatter</a> or
+		  scatter</a>,
+	<a href="?page=Template:Visualizer/Area&amp;project=en.wikipedia.org&amp;tpl=visualizer&amp;ct=area">
+		  area</a> or
 	<a href="?page=User:Al_Maghi/Visualize_Wikipedias_growth_up_to_2010&amp;project=en.wikipedia.org&amp;tpl=visualize&amp;y=Bytes+per+article&amp;x=Articles&amp;group=Wikipedias">
 		  motion</a> charts.
       </div>';

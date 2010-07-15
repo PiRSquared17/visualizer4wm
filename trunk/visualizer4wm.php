@@ -309,7 +309,7 @@ function getDataFromLines($p_dataLines)
       {
 	$l_data[$l_lineIndex] = explode("\n|", $l_line);
       }
-      //$l_wikiString .= sprintf("  {{dataset|%s|%s|%s}}\n", $l_data[$l_lineIndex][0], $l_data[$l_lineIndex][1], $l_data[$l_lineIndex][2]);
+      //$l_wikiString .= sprintf(" %s|%s|%s\n", $l_data[$l_lineIndex][0], $l_data[$l_lineIndex][1], $l_data[$l_lineIndex][2]);
     }
   }
   //echo $l_wikiString."<br />End.";

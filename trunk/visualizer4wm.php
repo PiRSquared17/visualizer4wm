@@ -289,22 +289,23 @@ function getDataFromLines($p_dataLines)
       $l_line = strstr($l_line, "}}"); // remove the template and its parameters.
       if (false==$l_line) exit('Error: template ending code "}}" not found after the template opening.');
       $l_line = substr($l_line, 2);
+      $l_line=substr(trim($l_line),1);
 
       $l_data[$l_lineIndex] = explode("!!", $l_line);
-      if (count($l_data[$l_lineIndex]) < 1)
+      if (count($l_data[$l_lineIndex]) < 2)
       {
 	$l_data[$l_lineIndex] = explode("\n!", $l_line);
-	if (count($l_data[$l_lineIndex]) < 1) continue;
+	if (count($l_data[$l_lineIndex]) < 2) continue;
       }
-
       //$l_wikiString .= sprintf("First line: %s|%s|%s<br />\n", $l_data[$l_lineIndex][0], $l_data[$l_lineIndex][1], $l_data[$l_lineIndex][2]);
-
     } 
     else
     {
+      $l_line=substr(trim($l_line),1);
+
       $l_data[$l_lineIndex] = explode("||", $l_line);
 
-      if (count($l_data[$l_lineIndex]) < 1)
+      if (count($l_data[$l_lineIndex]) < 2)
       {
 	$l_data[$l_lineIndex] = explode("\n|", $l_line);
       }

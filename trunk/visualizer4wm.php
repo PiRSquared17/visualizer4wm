@@ -197,23 +197,31 @@ function getDataLinesFromContent($p_content, $p_templateName)
 }
 
 
-function generateChartFromDataLines($p_dataLines,$p_ct, $p_displayedPageName)
+/**
+ ** @brief generateChartFromDataLines
+ ** @param $p_dataLines Array of lines,
+ ** @param $p_ct Chart type,
+ ** @param $p_displayedPageName Page name,
+ ** @details Returns an array of the data.
+ **
+ */
+function generateChartFromDataLines($p_dataLines,$p_ct, $p_chartTitle)
 {
+  //$l_htmlChart = "$p_dataLines[0]<br/>$p_dataLines[1]<br/><hr/>"; //debug
 
-  $l_htmlChart = "$p_dataLines[0]<br/>$p_dataLines[1]<br/><hr/>"; //debug
-
+  # Get the data.
   $l_data=getDataFromLines($p_dataLines);
 
-  $l_htmlChart .= $l_data[0][0];
+  /*$l_htmlChart .= $l_data[0][0];
   $l_htmlChart .="<br/>";
   $l_htmlChart .= $l_data[0][1];
   $l_htmlChart .="<br/>";
   $l_htmlChart .= $l_data[1][0];
   $l_htmlChart .="<br/>";
   $l_htmlChart .= $l_data[1][1];
-  $l_htmlChart .="<hr/>";
+  $l_htmlChart .="<hr/>";*/
 
-  // Print the columns
+  # Set the columns of data.
   $javascriptColumns = Array();
   $jsCol = sprintf("data.addColumn('string', '%s')", trim($l_data[0][0]));
   array_push($javascriptColumns, $jsCol);
@@ -225,20 +233,9 @@ function generateChartFromDataLines($p_dataLines,$p_ct, $p_displayedPageName)
   }
   $l_cols = implode(";\n", $javascriptColumns).';';
 
-  $l_nbOfRows= count($l_data);
-
-
-  // Print the rows
+  # Set the rows of data.
   /*    data.setValue(0, 0, 'Work');
-        data.setValue(0, 1, 11);
-        data.setValue(1, 0, 'Eat');
-        data.setValue(1, 1, 2);
-        data.setValue(2, 0, 'Commute');
-        data.setValue(2, 1, 2);
-        data.setValue(3, 0, 'Watch TV');
-        data.setValue(3, 1, 2);
-        data.setValue(4, 0, 'Sleep');
-        data.setValue(4, 1, 7); */
+        data.setValue(0, 1, 11); */
 
   $javascriptRows = Array();
   for ($i = 1; $i < count($l_data); $i++)
@@ -250,6 +247,7 @@ function generateChartFromDataLines($p_dataLines,$p_ct, $p_displayedPageName)
   }
   $l_rows = implode(",\n", $javascriptRows);
 
+  # Set the chart name.
   switch ($p_ct) {
       case "pie":
 	  $ChartType = 'PieChart';
@@ -258,9 +256,11 @@ function generateChartFromDataLines($p_dataLines,$p_ct, $p_displayedPageName)
 	  $ChartType = 'BarChart';
 	  break;
   }
- 
 
-  $l_jsCode = <<<MYJSCODE
+  # Set the number of rows.
+  $l_nbOfRows= count($l_data);
+
+  $l_jsChart = <<<MYJSCODE
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <script type="text/javascript">
       google.load("visualization", "1", {packages:["corechart"]});
@@ -272,23 +272,26 @@ function generateChartFromDataLines($p_dataLines,$p_ct, $p_displayedPageName)
 	$l_rows
 
         var chart = new google.visualization.$ChartType(document.getElementById('chart_div'));
-        chart.draw(data, {width: 450, height: 300, title: '$p_displayedPageName'});
+        chart.draw(data, {width: 450, height: 300, title: '$p_chartTitle'});
       }
     </script>
 MYJSCODE;
 
-  $l_htmlChart .= '<!--Div that will hold the pie chart-->
-    <div id="chart_div"></div>';
+  $l_htmlChart = '<div id="chart_div"></div>';
 
-  return array($l_jsCode, $l_htmlChart);
+  return array($l_jsChart, $l_htmlChart);
 
 }
 
+/**
+ ** @brief getDataFromLines
+ ** @param $p_dataLines
+ ** @details Returns an array of the data.
+ **
+ */
 function getDataFromLines($p_dataLines)
 {
-
   $l_data=array();
-  //$l_wikiString="";
   $l_lineIndex = -1;
   foreach ($p_dataLines as $l_line)
   {
@@ -300,30 +303,25 @@ function getDataFromLines($p_dataLines)
       $l_line = strstr($l_line, "}}"); // remove the template and its parameters.
       if (false==$l_line) exit('Error: template ending code "}}" not found after the template opening.');
       $l_line = substr($l_line, 2);
-      $l_line=substr(trim($l_line),1);
 
+      $l_line=substr(trim($l_line),1);
       $l_data[$l_lineIndex] = explode("!!", $l_line);
       if (count($l_data[$l_lineIndex]) < 2)
       {
 	$l_data[$l_lineIndex] = explode("\n!", $l_line);
 	if (count($l_data[$l_lineIndex]) < 2) continue;
       }
-      //$l_wikiString .= sprintf("First line: %s|%s|%s<br />\n", $l_data[$l_lineIndex][0], $l_data[$l_lineIndex][1], $l_data[$l_lineIndex][2]);
     } 
     else
     {
       $l_line=substr(trim($l_line),1);
-
       $l_data[$l_lineIndex] = explode("||", $l_line);
-
       if (count($l_data[$l_lineIndex]) < 2)
       {
 	$l_data[$l_lineIndex] = explode("\n|", $l_line);
       }
-      //$l_wikiString .= sprintf(" %s|%s|%s\n", $l_data[$l_lineIndex][0], $l_data[$l_lineIndex][1], $l_data[$l_lineIndex][2]);
     }
   }
-  //echo $l_wikiString."<br />End.";
   return $l_data;
 }
 

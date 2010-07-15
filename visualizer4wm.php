@@ -221,11 +221,16 @@ function generateChartFromDataLines($p_dataLines,$p_ct, $p_chartTitle)
   $l_htmlChart .= $l_data[1][1];
   $l_htmlChart .="<hr/>";*/
 
+  # Set the numbers of rows and cols.
+  $l_nbOfRows = count($l_data);
+  $l_nbOfCols = count($l_data[0]);
+
+
   # Set the columns of data.
   $javascriptColumns = Array();
   $jsCol = sprintf("data.addColumn('string', '%s')", trim($l_data[0][0]));
   array_push($javascriptColumns, $jsCol);
-  for ($i = 1; $i < count($l_data[0]); $i++)
+  for ($i = 1; $i < $l_nbOfCols; $i++)
   {
     $jsCol = sprintf("data.addColumn('number', '%s')", trim($l_data[0][$i]));
     array_push($javascriptColumns, $jsCol);
@@ -238,12 +243,17 @@ function generateChartFromDataLines($p_dataLines,$p_ct, $p_chartTitle)
         data.setValue(0, 1, 11); */
 
   $javascriptRows = Array();
-  for ($i = 1; $i < count($l_data); $i++)
+  for ($i = 1; $i < $l_nbOfRows; $i++)
   {
-    $jsRow = sprintf("data.setValue(%s, %s, '%s')", $i, 0, trim($l_data[$i][0]) );
+    $j = 0;
+    $jsRow = sprintf("data.setValue(%s, %s, '%s')", $i, $j, trim($l_data[$i][$j]) );
     array_push($javascriptRows, $jsRow);
-    $jsRow = sprintf("data.setValue(%s, %s, %s)", $i, 1,  trim($l_data[$i][1]) );
+
+    for ($j = 1; $j < $l_nbOfCols; $j++)
+    {
+    $jsRow = sprintf("data.setValue(%s, %s, %s)", $i, $j, trim($l_data[$i][$j]) );
     array_push($javascriptRows, $jsRow);
+    }
   }
   $l_rows = implode(",\n", $javascriptRows);
 
@@ -260,9 +270,7 @@ function generateChartFromDataLines($p_dataLines,$p_ct, $p_chartTitle)
 	  break;
   }
 
-  # Set the number of rows.
-  $l_nbOfRows= count($l_data);
-
+  # Set the javaScript.
   $l_jsChart = <<<MYJSCODE
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <script type="text/javascript">
@@ -280,6 +288,7 @@ function generateChartFromDataLines($p_dataLines,$p_ct, $p_chartTitle)
     </script>
 MYJSCODE;
 
+  # Set the html.
   $l_htmlChart = '<div id="chart_div"></div>';
 
   return array($l_jsChart, $l_htmlChart);
@@ -346,7 +355,7 @@ function printHTML($p_javaScriptCode="",
 		  pie</a>,
 	<a href="?page=Template:Visualizer&project=en.wikipedia.org&tpl=visualizer&ct=bar">
 		  bar</a>,
-	<a href="?page=Template:Visualizer&project=en.wikipedia.org&tpl=visualizer&ct=line">
+	<a href="?page=Template:Visualizer&project=en.wikipedia.org&tpl=visualizer/Test&ct=line">
 		  line</a> or
 	<a href="?page=User:Al_Maghi/Visualize_Wikipedias_growth_up_to_2010&amp;project=en.wikipedia.org&amp;tpl=visualize&amp;y=Bytes+per+article&amp;x=Articles&amp;group=Wikipedias">
 		  motion</a> charts.

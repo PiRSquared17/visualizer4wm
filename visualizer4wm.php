@@ -355,7 +355,7 @@ function printHTML($p_javaScriptCode="",
 		  pie</a>,
 	<a href="?page=Template:Visualizer&project=en.wikipedia.org&tpl=visualizer&ct=bar">
 		  bar</a>,
-	<a href="?page=Template:Visualizer&project=en.wikipedia.org&tpl=visualizer/Test&ct=line">
+	<a href="?page=Template:Visualizer/Test&project=en.wikipedia.org&tpl=visualizer&ct=line">
 		  line</a> or
 	<a href="?page=User:Al_Maghi/Visualize_Wikipedias_growth_up_to_2010&amp;project=en.wikipedia.org&amp;tpl=visualize&amp;y=Bytes+per+article&amp;x=Articles&amp;group=Wikipedias">
 		  motion</a> charts.

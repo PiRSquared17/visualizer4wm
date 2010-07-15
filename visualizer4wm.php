@@ -222,12 +222,11 @@ function generateChartFromDataLines($p_dataLines,$p_ct, $p_displayedPageName)
     $jsCol = sprintf("data.addColumn('number', '%s')", trim($l_data[0][$i]));
     array_push($javascriptColumns, $jsCol);
   }
-  $l_cols = implode(";\n", $javascriptColumns);
+  $l_cols = implode(";\n", $javascriptColumns).';';
 
 
   // Print the rows
-  $l_rows = "
-  ['Eat', 2, 1, 1],
+  $l_rows = "['Eat', 2, 1, 1],
   ['Commute', 2, 1, 1],
   ['Watch TV', 2, 1, 1],
   ['Sleep', 7, 1, 1]";
@@ -251,7 +250,7 @@ function generateChartFromDataLines($p_dataLines,$p_ct, $p_displayedPageName)
         var data = new google.visualization.DataTable();
 	$l_cols
         data.addRows([
-	  $l_rows
+	$l_rows
         ]);
 
         // Instantiate and draw our chart, passing in some options.

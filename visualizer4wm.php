@@ -225,43 +225,45 @@ function generateChartFromDataLines($p_dataLines,$p_ct, $p_displayedPageName)
   }
   $l_cols = implode(";\n", $javascriptColumns).';';
 
+  $l_nbOfRows= count($l_data);
+
 
   // Print the rows
+  /*    data.setValue(0, 0, 'Work');
+        data.setValue(0, 1, 11);
+        data.setValue(1, 0, 'Eat');
+        data.setValue(1, 1, 2);
+        data.setValue(2, 0, 'Commute');
+        data.setValue(2, 1, 2);
+        data.setValue(3, 0, 'Watch TV');
+        data.setValue(3, 1, 2);
+        data.setValue(4, 0, 'Sleep');
+        data.setValue(4, 1, 7); */
+
   $javascriptRows = Array();
   for ($i = 1; $i < count($l_data); $i++)
   {
-    $jsRow = sprintf("['%s', %s]", trim($l_data[$i][0]), trim($l_data[$i][1]) );
+    $jsRow = sprintf("data.setValue(%s, %s, '%s')", $i, 0, trim($l_data[$i][0]) );
     array_push($javascriptRows, $jsRow);
-
+    $jsRow = sprintf("data.setValue(%s, %s, %s)", $i, 1,  trim($l_data[$i][1]) );
+    array_push($javascriptRows, $jsRow);
   }
   $l_rows = implode(",\n", $javascriptRows);
 
 
   $l_jsCode = <<<MYJSCODE
- <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <script type="text/javascript">
-    
-      // Load the Visualization API and the piechart package.
-      google.load('visualization', '1', {'packages':['piechart']});
-      
-      // Set a callback to run when the Google Visualization API is loaded.
+      google.load("visualization", "1", {packages:["corechart"]});
       google.setOnLoadCallback(drawChart);
-      
-      // Callback that creates and populates a data table, 
-      // instantiates the pie chart, passes in the data and
-      // draws it.
       function drawChart() {
-
-      // Create our data table.
         var data = new google.visualization.DataTable();
-	$l_cols
-        data.addRows([
+        $l_cols
+        data.addRows($l_nbOfRows);
 	$l_rows
-        ]);
 
-        // Instantiate and draw our chart, passing in some options.
         var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
-        chart.draw(data, {width: 400, height: 240, is3D: true, title: '$p_displayedPageName'});
+        chart.draw(data, {width: 450, height: 300, title: '$p_displayedPageName'});
       }
     </script>
 MYJSCODE;

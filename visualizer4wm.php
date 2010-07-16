@@ -174,7 +174,7 @@ function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
 
   # Set the numbers of rows and cols.
   $l_nbOfRows = count($l_data)-1;
-  $l_nbOfCols = count($l_data[0]);
+  $l_nbOfCols = get("columns",count($l_data[0]));
 
 $l_firstColType = 'string';
 $l_firstColSeparator = "'";

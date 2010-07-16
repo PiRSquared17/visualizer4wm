@@ -2,16 +2,16 @@
 /** @file visualizer4wm.php
  ** @brief Visualize data published on a wikimedia project
  ** @details Visualize data using MediaWiki and charting APIs.
- ** It offers visualization of data published on a wikipage using some authorised templates.
+ ** It offers visualization of data published on a wikipage.
  ** Authors include [[w:fr:User:Al Maghi]] and Xavier Marcelet.
  **/
 
 
 /**
- ** @brief get url parameter
- ** @param p_name name of arg
- ** @param p_default default value of arg
- ** @details get parameter from url arguments
+ ** @brief Get parameter
+ ** @param p_name Name of the url arg
+ ** @param p_default Default value for the parameter
+ ** @details Get parameter from url arguments
  */
 function get($p_name, $p_default=null)
 {
@@ -54,10 +54,10 @@ function getContentFromMediaWiki ($p_pageName,$p_projectUrl)
 
 
 /**
- ** @brief Return an array of the wikitable lines from the page content
- ** @param p_content source code of the wikipage (string)
+ ** @brief Get the wikitable lines from the page content
+ ** @param p_content Source code of the wikipage (string)
  ** @param p_templateName The template name
- ** @details
+ ** @details Return an array of the wikitable lines:
  ** {|
  ** |+ {{visualizer}}
  ** ! ''en'' !! 2003/0/1 !! East
@@ -109,7 +109,7 @@ function getWikiTableFromContent($p_content, $p_templateName)
 /**
  ** @brief Remove the unwanted wiki syntax 
  ** @param $p_input String to clean
- ** @details Returns a clean string without wikilinks, references, etc.
+ ** @details Return the input without wikilinks, references, etc.
  **
  */
 function cleanWikitableContent($p_input)
@@ -139,10 +139,10 @@ function cleanWikitableContent($p_input)
 }
 
 /**
- ** @brief Remove regexp matches.
+ ** @brief Remove regexp matches
  ** @param $p_regexp Regular expression
  ** @param $p_input String to clean
- ** @details Returns a clean string.
+ ** @details Return a clean string.
  **
  */
 function removeRegexpMatch($p_regexp,$p_input)
@@ -157,11 +157,11 @@ function removeRegexpMatch($p_regexp,$p_input)
 
 
 /**
- ** @brief generateChartFromTableLines
- ** @param $p_dataLines Array of lines,
+ ** @brief Generate the chart from the table lines
+ ** @param $p_dataLines Array of lines from the wikitable,
  ** @param $p_ct the chart type,
  ** @param $p_chartTitle the chart title for UI,
- ** @details Returns an array of the data.
+ ** @details Return an array of the html and js to be printed.
  **
  */
 function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
@@ -222,7 +222,6 @@ $l_firstColSeparator = "'";
   $l_cols = implode(";\n", $javascriptColumns).';';
 
   # Set the rows of data.
-
   $javascriptRows = Array();
   for ($i = 0; $i < $l_nbOfRows; $i++)
   {
@@ -263,13 +262,12 @@ MYJSCODE;
   $l_htmlChart = '<div id="chart_div"></div>';
 
   return array($l_jsChart, $l_htmlChart);
-
 }
 
 /**
- ** @brief getDataFromWikitableLines
- ** @param $p_dataLines
- ** @details Returns an array of the data.
+ ** @brief Get data from the wikitable lines
+ ** @param $p_dataLines Array of lines from the wikitable,
+ ** @details Return an array of the data.
  **
  */
 function getDataFromWikitableLines($p_dataLines)
@@ -281,9 +279,10 @@ function getDataFromWikitableLines($p_dataLines)
     if (""==$l_line) continue; // Empty lines are ignored.
     $l_lineIndex += 1;
 
+    $l_line=substr(trim($l_line),1); // Remove the starting "|" or "!".
+
     if ($l_lineIndex == 0) // First line.
     {
-      $l_line=substr(trim($l_line),1);
       $l_data[$l_lineIndex] = explode("!!", $l_line);
       if (count($l_data[$l_lineIndex]) < 2)
       {
@@ -291,9 +290,8 @@ function getDataFromWikitableLines($p_dataLines)
 	if (count($l_data[$l_lineIndex]) < 2) continue;
       }
     } 
-    else
+    else		// Other lines.
     {
-      $l_line=substr(trim($l_line),1);
       $l_data[$l_lineIndex] = explode("||", $l_line);
       if (count($l_data[$l_lineIndex]) < 2)
       {
@@ -306,9 +304,9 @@ function getDataFromWikitableLines($p_dataLines)
 
 
 /**
- ** @brief motionChart only - Return javascript rows of data from raw content
- ** @param $p_content page content
- ** @details
+ ** @brief motionChart only - Generate javascript rows of data from the page content
+ ** @param $p_content The raw content of the page
+ ** @details For motion chart:
  ** {{visualize|
  **  {{dataset| en | 2003/0/1 | 10000 | 20000 | East }}
  **  {{dataset| fr | 2003/0/1 | 5000 | 10000 | West }}
@@ -353,7 +351,7 @@ function motionChart_generateJsFromContent($p_content)
 
 
 /**
- ** @brief motionChart only - Set the js and the html to be printed.
+ ** @brief motionChart only - Set the js and the html to be printed
  ** @param $p_pageName,
  ** @param $p_displayedPageName,
  ** @param $p_projectUrl,
@@ -361,7 +359,7 @@ function motionChart_generateJsFromContent($p_content)
  ** @param $p_groupName,
  ** @param $p_xAxisCaption,
  ** @param $p_yAxisCaption
- ** @details Retrun an array of js and html.
+ ** @details For motion chart: return an array of the js and html to be printed.
  **
  */
 function motionChart_setJsAndHtml($p_pageName, $p_displayedPageName, $p_projectUrl, $p_javascriptRows, $p_groupName, $p_xAxisCaption, $p_yAxisCaption)
@@ -404,7 +402,7 @@ MYJSCODE;
 
 
 /**
- ** @brief Print HTML
+ ** @brief Echo HTML document
  ** @param $p_javaScriptCode 
  ** @param $p_htmlCode 
  ** @details Print valid XHTML
@@ -501,7 +499,7 @@ function main()
   $l_pageContent = getContentFromMediaWiki($l_pageName,$l_projectUrl);
 
   # Get the template name.
-  $l_templateType  = get("tpl", "visualize");
+  $l_templateType = get("tpl", "visualize");
 
   # Generate the chart and print it.
   if ("visualize"==$l_templateType)

@@ -234,6 +234,8 @@ $l_firstColSeparator = "'";
   {
     for ($j = $l_colStarter; $j < $l_nbOfCols; $j++)
     {
+    $l_data[$i+1][$j] = str_replace(",", ".", trim($l_data[$i+1][$j]));
+    $l_data[$i+1][$j] = str_replace(" ", "", $l_data[$i+1][$j]);
     $l_data[$i+1][$j] = floatval($l_data[$i+1][$j]);
     }
   }

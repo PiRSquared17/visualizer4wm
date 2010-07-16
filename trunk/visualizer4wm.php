@@ -27,7 +27,7 @@ function get($p_name, $p_default=null)
  ** @brief Get the page content with MediaWiki API
  ** @param $p_pageName	 The page name
  ** @param $p_projectUrl The project url, eg. en.wikipedia.org
- ** @details Return raw content.
+ ** @details Return the raw content of the page.
  **
  */
 function getContentFromMediaWiki ($p_pageName,$p_projectUrl)
@@ -60,43 +60,59 @@ function getContentFromMediaWiki ($p_pageName,$p_projectUrl)
  ** @details
  ** {|
  ** |+ text {{visualizer| }}
- ** ! en !! 2003/0/1 !! East
+ ** ! ''en'' !! 2003/0/1 !! East
  ** |-
- ** | dataset || 68465 || 26843 
+ ** | [[France]] || 68465 || 26843 
  ** |}
  **
  ** -> to
  **
- ** line[0]:  {{visualizer|text}} ! date !! A !! B !! C
- ** line[1]:  |2009/10/01 || 2464585 || 2325667 || 857585 
+ ** line[0]:  {{visualizer| }} ! en !! 2003/0/1 !! East
+ ** line[1]:  |France || 68465 || 26843
  */
 function getWikiTableFromContent($p_content, $p_templateName)
 {
+  // Get the wikitable content.
+  $l_tableContent = strstr($p_content, "{{".ucfirst($p_templateName));
+  if (false==$l_tableContent)
+  {
+    $l_tableContent = strstr($p_content, "{{".lcfirst($p_templateName));
+  }
+  if (false==$l_tableContent)
+  {
+    return "error1";
+  }
 
-    $l_tableContent = strstr($p_content, "{{".ucfirst($p_templateName));
-    if (false==$l_tableContent)
-    {
-      $l_tableContent = strstr($p_content, "{{".lcfirst($p_templateName));
+  $l_endingContent = strstr( $l_tableContent, "\n|}");
+  if (false==$l_endingContent)
+  {
+      return "error2";
+  }
+  $l_tableContent=substr( $l_tableContent, 0, -strlen($l_endingContent) );
+
+  // Manage its wikisyntax: remove references.
+  $l_regexp = "&lt;ref(.*)&gt;(.*)&lt;\/ref&gt;";
+  if(preg_match_all("/$l_regexp/siU", $l_tableContent, $matches, PREG_SET_ORDER)) {
+    foreach($matches as $match) {
+      $l_tableContent=str_replace($match[0],'',$l_tableContent);
     }
-    if (false==$l_tableContent)
-    {
-      return "error1";
+  }
+  $l_regexp = "&lt;ref(.*)\/&gt;";
+  if(preg_match_all("/$l_regexp/siU", $l_tableContent, $matches, PREG_SET_ORDER)) {
+    foreach($matches as $match) {
+      $l_tableContent=str_replace($match[0],'',$l_tableContent);
     }
+  }
 
-    $l_endingContent = strstr( $l_tableContent, "\n|}");
-    if (false==$l_endingContent)
-    {
-       return "error2";
-    }
-    $l_tableContent=substr( $l_tableContent, 0, -strlen($l_endingContent) );
+  // Manage its wikisyntax: remove links and formatting.
+  $l_tableContent=str_replace("[[","",$l_tableContent);
+  $l_tableContent=str_replace("]]","",$l_tableContent);
+  $l_tableContent=str_replace("'''","",$l_tableContent);
+  $l_tableContent=str_replace("''","",$l_tableContent);
 
-    $l_tableContent=str_replace("[[","",$l_tableContent);
-    $l_tableContent=str_replace("]]","",$l_tableContent);
-    $l_tableContent=str_replace("'''","",$l_tableContent);
-    $l_tableContent=str_replace("''","",$l_tableContent);
-
-    $l_line = explode("|-", $l_tableContent);
-    return $l_line;
+  // Return its lines.
+  $l_lines = explode("|-", $l_tableContent);
+  return $l_lines;
 
 }
 

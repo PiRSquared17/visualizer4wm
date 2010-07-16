@@ -25,7 +25,7 @@ function get($p_name, $p_default=null)
 
 /**
  ** @brief Get the page content with MediaWiki API
- ** @param $p_pageName	 The page name
+ ** @param $p_pageName The page name
  ** @param $p_projectUrl The project url, eg. en.wikipedia.org
  ** @details Return the raw content of the page.
  **
@@ -54,12 +54,12 @@ function getContentFromMediaWiki ($p_pageName,$p_projectUrl)
 
 
 /**
- ** @brief Return an array of the wikitable lines from the wiki source code
+ ** @brief Return an array of the wikitable lines from the page content
  ** @param p_content source code of the wikipage (string)
- ** @param p_templateName template name
+ ** @param p_templateName The template name
  ** @details
  ** {|
- ** |+ text {{visualizer| }}
+ ** |+ {{visualizer}}
  ** ! ''en'' !! 2003/0/1 !! East
  ** |-
  ** | [[France]] || 68465 || 26843 
@@ -67,12 +67,12 @@ function getContentFromMediaWiki ($p_pageName,$p_projectUrl)
  **
  ** -> to
  **
- ** line[0]:  {{visualizer| }} ! en !! 2003/0/1 !! East
+ ** line[0]:  ! en !! 2003/0/1 !! East
  ** line[1]:  |France || 68465 || 26843
  */
 function getWikiTableFromContent($p_content, $p_templateName)
 {
-  // Get the wikitable content.
+  // Remove everything before the template.
   $l_tableContent = strstr($p_content, "{{".ucfirst($p_templateName));
   if (false==$l_tableContent)
   {
@@ -83,6 +83,12 @@ function getWikiTableFromContent($p_content, $p_templateName)
     return "error1";
   }
 
+  // Remove the template.
+  $l_tableContent = strstr($l_tableContent, "}}");
+  if (false==$l_tableContent) exit('Error: template ending code "}}" not found after the template opening.');
+  $l_tableContent = substr($l_tableContent, 2);
+
+  // Remove everything after the wikitable.
   $l_endingContent = strstr( $l_tableContent, "\n|}");
   if (false==$l_endingContent)
   {
@@ -90,27 +96,10 @@ function getWikiTableFromContent($p_content, $p_templateName)
   }
   $l_tableContent=substr( $l_tableContent, 0, -strlen($l_endingContent) );
 
-  // Manage its wikisyntax: remove references.
-  $l_regexp = "&lt;ref(.*)&gt;(.*)&lt;\/ref&gt;";
-  if(preg_match_all("/$l_regexp/siU", $l_tableContent, $matches, PREG_SET_ORDER)) {
-    foreach($matches as $match) {
-      $l_tableContent=str_replace($match[0],'',$l_tableContent);
-    }
-  }
-  $l_regexp = "&lt;ref(.*)\/&gt;";
-  if(preg_match_all("/$l_regexp/siU", $l_tableContent, $matches, PREG_SET_ORDER)) {
-    foreach($matches as $match) {
-      $l_tableContent=str_replace($match[0],'',$l_tableContent);
-    }
-  }
+  // Clean the wikitable wikisyntax.
+  $l_tableContent=cleanWikitableContent($l_tableContent);
 
-  // Manage its wikisyntax: remove links and formatting.
-  $l_tableContent=str_replace("[[","",$l_tableContent);
-  $l_tableContent=str_replace("]]","",$l_tableContent);
-  $l_tableContent=str_replace("'''","",$l_tableContent);
-  $l_tableContent=str_replace("''","",$l_tableContent);
-
-  // Return its lines.
+  // Return the wikitable lines.
   $l_lines = explode("|-", $l_tableContent);
   return $l_lines;
 
@@ -118,17 +107,67 @@ function getWikiTableFromContent($p_content, $p_templateName)
 
 
 /**
+ ** @brief Remove the unwanted wiki syntax 
+ ** @param $p_input String to clean
+ ** @details Returns a clean string without wikilinks, references, etc.
+ **
+ */
+function cleanWikitableContent($p_input)
+{
+  // Manage its wikisyntax: remove references.
+  $l_regexp = "&lt;ref(.*)&gt;(.*)&lt;\/ref&gt;";
+  $p_input = removeRegexpMatch($l_regexp,$p_input);
+
+  $l_regexp = "&lt;ref(.*)\/&gt;";
+  $p_input = removeRegexpMatch($l_regexp,$p_input);
+
+  // Manage its wikisyntax: remove links and formatting.
+  $l_remove = array ("[[","]]","'''","''");
+
+  $l_regexp = "align=&quot;(.*)\|";
+  if(preg_match_all("/$l_regexp/siU", $p_input, $matches, PREG_SET_ORDER)) {
+    foreach($matches as $match) {
+      if ( !in_array( $match[0], $l_remove)) {
+	array_push($l_remove, $match[0]);
+      }
+    }
+  }
+  foreach($l_remove as $s) {
+    $p_input=str_replace( $s,'',$p_input);
+  }
+  return $p_input;
+}
+
+/**
+ ** @brief Remove regexp matches.
+ ** @param $p_regexp Regular expression
+ ** @param $p_input String to clean
+ ** @details Returns a clean string.
+ **
+ */
+function removeRegexpMatch($p_regexp,$p_input)
+{
+  if(preg_match_all("/$p_regexp/siU", $p_input, $matches, PREG_SET_ORDER)) {
+    foreach($matches as $match) {
+      $p_input=str_replace($match[0],'',$p_input);
+    }
+  }
+  return $p_input;
+}
+
+
+/**
  ** @brief generateChartFromTableLines
  ** @param $p_dataLines Array of lines,
- ** @param $p_ct Chart type,
- ** @param $p_displayedPageName Page name,
+ ** @param $p_ct the chart type,
+ ** @param $p_chartTitle the chart title for UI,
  ** @details Returns an array of the data.
  **
  */
 function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
 {
   # Get the data.
-  $l_data=getDataFromTableLines($p_dataLines);
+  $l_data=getDataFromWikitableLines($p_dataLines);
 
   # Set the numbers of rows and cols.
   $l_nbOfRows = count($l_data)-1;
@@ -228,12 +267,12 @@ MYJSCODE;
 }
 
 /**
- ** @brief getDataFromTableLines
+ ** @brief getDataFromWikitableLines
  ** @param $p_dataLines
  ** @details Returns an array of the data.
  **
  */
-function getDataFromTableLines($p_dataLines)
+function getDataFromWikitableLines($p_dataLines)
 {
   $l_data=array();
   $l_lineIndex = -1;
@@ -244,10 +283,6 @@ function getDataFromTableLines($p_dataLines)
 
     if ($l_lineIndex == 0) // First line.
     {
-      $l_line = strstr($l_line, "}}"); // remove the template and its parameters.
-      if (false==$l_line) exit('Error: template ending code "}}" not found after the template opening.');
-      $l_line = substr($l_line, 2);
-
       $l_line=substr(trim($l_line),1);
       $l_data[$l_lineIndex] = explode("!!", $l_line);
       if (count($l_data[$l_lineIndex]) < 2)
@@ -271,15 +306,12 @@ function getDataFromTableLines($p_dataLines)
 
 
 /**
- ** @brief motionChart only - Return javascript rows of data
+ ** @brief motionChart only - Return javascript rows of data from raw content
  ** @param $p_content page content
  ** @details
- ** MediaWiki template sample:
- **
  ** {{visualize|
  **  {{dataset| en | 2003/0/1 | 10000 | 20000 | East }}
  **  {{dataset| fr | 2003/0/1 | 5000 | 10000 | West }}
- ** }}
  **
  **     to ->
  **
@@ -486,15 +518,6 @@ function main()
   }
   else
   {
-    # Try to get data from content or return an error.
-    $l_dataLines = getWikiTableFromContent($l_pageContent,$l_templateType);
-    if ('error1'==$l_dataLines) {
-      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the string: <tt>{{Visualizer</tt><br />Check the template parameter <tt>tpl=$l_templateType</tt>");
-    }
-    if ('error2'==$l_dataLines) {
-      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the line: <tt>|}</tt>");
-    }
-
     # Get the chart type and check it.
     $l_chartType  = get("ct", "pie");
     if ( !in_array( $l_chartType, $l_parameters['chart types'])) {
@@ -503,6 +526,15 @@ function main()
 
     # Get the chart title.
     $l_chartTitle = get("title", $l_displayedPageName);
+
+    # Try to get data from content or return an error.
+    $l_dataLines = getWikiTableFromContent($l_pageContent,$l_templateType);
+    if ('error1'==$l_dataLines) {
+      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the string: <tt>{{Visualizer</tt><br />Check the template parameter <tt>tpl=$l_templateType</tt>");
+    }
+    if ('error2'==$l_dataLines) {
+      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the line: <tt>|}</tt>");
+    }
 
     # Generate the chart js and html.   
     $l_Chart=generateChartFromTableLines($l_dataLines, $l_chartType, $l_chartTitle);

@@ -536,13 +536,13 @@ function main()
   else
   {
     # Get the chart type and check it.
-    $l_chartType  = get("ctype", "pie");
+    $l_chartType  = get("ct", "pie");
     if ( !in_array( $l_chartType, $l_parameters['chart types'])) {
       exit("Sorry but the chart type \"$l_chartType\" is not valid.");
     }
 
     # Get the chart title.
-    $l_chartTitle = get("ctitle", $l_displayedPageName);
+    $l_chartTitle = get("title", $l_displayedPageName);
 
     # Try to get data from content or return an error.
     $l_dataLines = getWikiTableFromContent($l_pageContent,$l_templateType);

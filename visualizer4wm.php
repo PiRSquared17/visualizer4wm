@@ -432,7 +432,7 @@ function printHTML($p_javaScriptCode="",
 {
 
   if (''==$p_htmlCode) {
-    $p_htmlCode='<div id="index">Welcome on the visualizer tool.<br /> 
+    $p_htmlCode='<div id="index"><br />Welcome on the wikitable visualizer tool.<br /><br />
 		  See it in action with
 	<a href="?page=Template:Visualizer&amp;project=en.wikipedia.org&amp;tpl=visualizer&amp;ct=pie">
 		  pie</a>,
@@ -536,13 +536,13 @@ function main()
   else
   {
     # Get the chart type and check it.
-    $l_chartType  = get("ct", "pie");
+    $l_chartType  = get("ctype", "pie");
     if ( !in_array( $l_chartType, $l_parameters['chart types'])) {
       exit("Sorry but the chart type \"$l_chartType\" is not valid.");
     }
 
     # Get the chart title.
-    $l_chartTitle = get("title", $l_displayedPageName);
+    $l_chartTitle = get("ctitle", $l_displayedPageName);
 
     # Try to get data from content or return an error.
     $l_dataLines = getWikiTableFromContent($l_pageContent,$l_templateType);

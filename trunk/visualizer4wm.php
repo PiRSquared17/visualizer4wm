@@ -135,6 +135,9 @@ function cleanWikitableContent($p_input)
   foreach($l_remove as $s) {
     $p_input=str_replace( $s,'',$p_input);
   }
+
+  $p_input=str_replace("'","\'",$p_input);
+
   return $p_input;
 }
 
@@ -221,6 +224,20 @@ $l_firstColSeparator = "'";
   }
   $l_cols = implode(";\n", $javascriptColumns).';';
 
+
+  # Clean the rows of data to get float values.
+  $l_colStarter = 1;
+  if ('number'==$l_firstColType) {
+  $l_colStarter = 0;
+  }
+  for ($i = 0; $i < $l_nbOfRows; $i++)
+  {
+    for ($j = $l_colStarter; $j < $l_nbOfCols; $j++)
+    {
+    $l_data[$i+1][$j] = floatval($l_data[$i+1][$j]);
+    }
+  }
+
   # Set the rows of data.
   $javascriptRows = Array();
   for ($i = 0; $i < $l_nbOfRows; $i++)
@@ -251,7 +268,7 @@ $l_firstColSeparator = "'";
 	$l_rows
 
         var chart = new google.visualization.$ChartType(document.getElementById('chart_div'));
-        chart.draw(data, {width: 450, height: 300,
+        chart.draw(data, {width: 1000, height: 500,
 			  title: '$p_chartTitle'$l_chartAxis
 			  });
       }

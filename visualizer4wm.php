@@ -176,8 +176,9 @@ function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
   $l_nbOfRows = count($l_data)-1;
   $l_nbOfCols = get("columns",count($l_data[0]));
 
-$l_firstColType = 'string';
-$l_firstColSeparator = "'";
+  $ChartPackage = 'corechart';
+  $l_firstColType = 'string';
+  $l_firstColSeparator = "'";
 
   # Set the chart name and its axis.
   switch ($p_ct) {
@@ -209,6 +210,10 @@ $l_firstColSeparator = "'";
 	  $l_hTitle=trim($l_data[0][0]);
 	  $l_chartAxis =",
 		    hAxis: {title: '$l_hTitle'}";
+	  break;
+      case "geomap":
+	  $ChartPackage='geomap';
+	  $ChartType = 'GeoMap';
 	  break;
   }
 
@@ -261,7 +266,7 @@ $l_firstColSeparator = "'";
   $l_jsChart = <<<MYJSCODE
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <script type="text/javascript">
-      google.load("visualization", "1", {packages:["corechart"]});
+      google.load("visualization", "1", {packages:["$ChartPackage"]});
       google.setOnLoadCallback(drawChart);
       function drawChart() {
         var data = new google.visualization.DataTable();
@@ -504,7 +509,7 @@ function main()
 					  'wikisource.org',
 					  'wikiversity.org'),
 
-    'chart types'		=>	array('pie','bar', 'col', 'line', 'scatter', 'area'),
+    'chart types'		=>	array('pie','bar', 'col', 'line', 'scatter', 'area', 'geomap'),
   );
 
   # Get the project url and check its domain name.

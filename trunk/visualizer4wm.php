@@ -546,14 +546,14 @@ function main()
   $l_pageContent = getContentFromMediaWiki($l_pageName,$l_projectUrl);
 
   # Get the template name.
-  $l_templateType = get("tpl", "visualize");
+  $l_templateName = get("tpl", "visualize");
 
   # Generate the chart and print it.
-  if ("visualize"==$l_templateType)
+  if ("visualize"==$l_templateName)
   {
     $l_javascriptRows = motionChart_generateJsFromContent($l_pageContent);
     if (null==$l_javascriptRows) {
-      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> is not using correctly {{dataset}} and {{visualize}}.<br />Check the template parameter <tt>tpl=$l_templateType</tt>");
+      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> is not using correctly {{dataset}} and {{visualize}}.<br />Check the template parameter <tt>tpl=$l_templateName</tt>");
     }
     $l_xAxisCaption  = get("x",     "x axis");
     $l_yAxisCaption  = get("y",     "y axis");
@@ -573,9 +573,9 @@ function main()
     $l_chartTitle = get("title", $l_displayedPageName);
 
     # Try to get data from content or return an error.
-    $l_dataLines = getWikiTableFromContent($l_pageContent,$l_templateType);
+    $l_dataLines = getWikiTableFromContent($l_pageContent,$l_templateName);
     if ('error1'==$l_dataLines) {
-      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the string: <tt>{{Visualizer</tt><br />Check the template parameter <tt>tpl=$l_templateType</tt>");
+      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the string: <tt>{{$l_templateName</tt><br />Check the template parameter <tt>tpl=$l_templateName</tt>");
     }
     if ('error2'==$l_dataLines) {
       exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the line: <tt>|}</tt>");

@@ -575,7 +575,7 @@ function main()
     # Try to get data from content or return an error.
     $l_dataLines = getWikiTableFromContent($l_pageContent,$l_templateName);
     if ('error1'==$l_dataLines) {
-      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the string: <tt>{{$l_templateName</tt><br />Check the template parameter <tt>tpl=$l_templateName</tt>");
+      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the string: <tt>{{".$l_templateName."</tt><br />Check the template parameter <tt>tpl=</tt>");
     }
     if ('error2'==$l_dataLines) {
       exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the line: <tt>|}</tt>");

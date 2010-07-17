@@ -179,8 +179,8 @@ function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
   $ChartPackage = 'corechart';
   $l_firstColType = 'string';
   $l_firstColSeparator = "'";
-  $addFirstColumnEnd='';
-  $addColumnEnd ='';
+  $firstColumnEnd='';
+  $columnEnd ='';
 
   # Set the chart name and its axis.
   switch ($p_ct) {
@@ -220,17 +220,26 @@ function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
       case "intensitymap":
 	  $ChartPackage='intensitymap';
 	  $ChartType = 'IntensityMap';
-	  $addFirstColumnEnd=", 'Country'";
-	  $addColumnEnd=", 'a'"; // array('a','b','c','d','e','f');
+	  $firstColumnEnd=", 'Country'";
+	  $columnEnd=array('a','b','c','d','e','f','g','h','i','j','k','l');
 	  break;
+      case "sparkline":
+	  $ChartPackage='imagesparkline';
+	  $ChartType = 'ImageSparkLine';
+	  $l_firstColType = 'number';
+	  $l_firstColSeparator = "";
+	  $l_chartAxis = ", showAxisLines: true,  showValueLabels: true, labelPosition: 'right'";
   }
 
   # Set the columns of data.
   $javascriptColumns = Array();
-  $jsCol = sprintf("data.addColumn('%s', '%s'%s)", $l_firstColType, trim($l_data[0][0]), $addFirstColumnEnd);
+  $jsCol = sprintf("data.addColumn('%s', '%s'%s)", $l_firstColType, trim($l_data[0][0]), $firstColumnEnd);
   array_push($javascriptColumns, $jsCol);
   for ($i = 1; $i < $l_nbOfCols; $i++)
   {
+    if (is_array($columnEnd)) {
+      $addColumnEnd=", '".$columnEnd[$i-1]."'";
+    }
     $jsCol = sprintf("data.addColumn('number', '%s'%s)", trim($l_data[0][$i]), $addColumnEnd);
     array_push($javascriptColumns, $jsCol);
 
@@ -517,7 +526,7 @@ function main()
 					  'wikisource.org',
 					  'wikiversity.org'),
 
-    'chart types'		=>	array('pie','bar', 'col', 'line', 'scatter', 'area', 'geomap', 'intensitymap'),
+    'chart types'		=>	array('pie','bar', 'col', 'line', 'scatter', 'area', 'geomap', 'intensitymap', 'sparkline'),
   );
 
   # Get the project url and check its domain name.

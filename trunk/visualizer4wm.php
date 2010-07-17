@@ -467,7 +467,13 @@ function printHTML($p_javaScriptCode="",
 	<a href="?page=Template:Visualizer/Scatter&amp;project=en.wikipedia.org&amp;tpl=visualizer&amp;ct=scatter">
 		  scatter</a>,
 	<a href="?page=Template:Visualizer/Area&amp;project=en.wikipedia.org&amp;tpl=visualizer&amp;ct=area">
-		  area</a> or
+		  area</a>,
+	<a href="?page=Template:Visualizer/GeoMap&amp;project=en.wikipedia.org&amp;tpl=visualizer&amp;ct=geomap">
+		  geomap</a>,
+	<a href="?page=Template:Visualizer/IntensityMap&amp;project=en.wikipedia.org&amp;tpl=visualizer&amp;ct=intensitymap">
+		  intensitymap</a>,
+	<a href="?page=Template:Visualizer/Test&amp;project=en.wikipedia.org&amp;tpl=visualizer&amp;ct=sparkline">
+		  sparkline</a> or
 	<a href="?page=User:Al_Maghi/Visualize_Wikipedias_growth_up_to_2010&amp;project=en.wikipedia.org&amp;tpl=visualize&amp;y=Bytes+per+article&amp;x=Articles&amp;group=Wikipedias">
 		  motion</a> charts.
       </div>';

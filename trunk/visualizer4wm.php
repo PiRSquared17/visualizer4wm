@@ -43,7 +43,7 @@ function getContentFromMediaWiki ($p_pageName,$p_projectUrl)
   $l_pageSourceCode = strstr($l_rawPageSourceCode, '<rev xml:space="preserve">');
   if (false==$l_pageSourceCode)
   {
-    exit("Sorry, the page <tt>[[<a href=\"http://$p_projectUrl/wiki/$p_pageName\">$p_pageName</a>]]</tt> does not exist on $p_projectUrl. (You may want to <a href=\"http://$p_projectUrl/w/index?title=$p_pageName&amp;action=edit\">start the page <em>$p_pageName</em></a>.)");
+    exit("Sorry, the page <tt>[[<a href=\"http://$p_projectUrl/wiki/$p_pageName\">$p_pageName</a>]]</tt> does not exist on $p_projectUrl. (You may want to <a href=\"http://$p_projectUrl/w/index.php?title=$p_pageName&amp;action=edit\">start the page <em>$p_pageName</em></a>.)");
   }
 
   $l_pageSourceCode = substr($l_pageSourceCode,

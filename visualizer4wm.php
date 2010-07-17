@@ -122,7 +122,7 @@ function cleanWikitableContent($p_input)
   $p_input = removeRegexpMatch($l_regexp,$p_input);
 
   // Manage its wikisyntax: remove links and formatting.
-  $l_remove = array ("[[","]]","'''","''");
+  $l_remove = array ("[[","]]","'''","''","{{formatnum:");
 
   $l_regexp = "align=&quot;(.*)\|";
   if(preg_match_all("/$l_regexp/siU", $p_input, $matches, PREG_SET_ORDER)) {
@@ -179,6 +179,8 @@ function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
   $ChartPackage = 'corechart';
   $l_firstColType = 'string';
   $l_firstColSeparator = "'";
+  $addFirstColumnEnd='';
+  $addColumnEnd ='';
 
   # Set the chart name and its axis.
   switch ($p_ct) {
@@ -215,15 +217,21 @@ function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
 	  $ChartPackage='geomap';
 	  $ChartType = 'GeoMap';
 	  break;
+      case "intensitymap":
+	  $ChartPackage='intensitymap';
+	  $ChartType = 'IntensityMap';
+	  $addFirstColumnEnd=", 'Country'";
+	  $addColumnEnd=", 'a'"; // array('a','b','c','d','e','f');
+	  break;
   }
 
   # Set the columns of data.
   $javascriptColumns = Array();
-  $jsCol = sprintf("data.addColumn('%s', '%s')", $l_firstColType, trim($l_data[0][0]));
+  $jsCol = sprintf("data.addColumn('%s', '%s'%s)", $l_firstColType, trim($l_data[0][0]), $addFirstColumnEnd);
   array_push($javascriptColumns, $jsCol);
   for ($i = 1; $i < $l_nbOfCols; $i++)
   {
-    $jsCol = sprintf("data.addColumn('number', '%s')", trim($l_data[0][$i]));
+    $jsCol = sprintf("data.addColumn('number', '%s'%s)", trim($l_data[0][$i]), $addColumnEnd);
     array_push($javascriptColumns, $jsCol);
 
   }
@@ -509,7 +517,7 @@ function main()
 					  'wikisource.org',
 					  'wikiversity.org'),
 
-    'chart types'		=>	array('pie','bar', 'col', 'line', 'scatter', 'area', 'geomap'),
+    'chart types'		=>	array('pie','bar', 'col', 'line', 'scatter', 'area', 'geomap', 'intensitymap'),
   );
 
   # Get the project url and check its domain name.

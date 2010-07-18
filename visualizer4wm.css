@@ -13,8 +13,8 @@ div#info a:hover {text-decoration: Underline; color: #0645AD;}
 
 div#documentation {
       position:fixed;
-      bottom:1em;
-      margin-left:1em;
+      bottom:3em;
+      margin-left:3em;
       color:#595454;
       font-size: 87%;
       }

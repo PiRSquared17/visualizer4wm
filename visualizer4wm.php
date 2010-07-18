@@ -278,6 +278,8 @@ function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
   }
   $l_rows = implode(";\n", $javascriptRows).";";
 
+  $l_height = get("height",'400');
+  $l_width = get("width",'1000');
 
   # Set the javaScript.
   $l_jsChart = <<<MYJSCODE
@@ -292,11 +294,14 @@ function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
 	$l_rows
 
         var chart = new google.visualization.$ChartType(document.getElementById('chart_div'));
-        chart.draw(data, {width: 1000, height: 500,
+        chart.draw(data, {width: $l_width, height:$l_height,
 			  title: '$p_chartTitle'$l_chartAxis
 			  });
       }
     </script>
+    <style type="text/css">
+      div#chart_div {width: $l_width px; height: $l_height px;}
+    </style>
 MYJSCODE;
 
   # Set the html.

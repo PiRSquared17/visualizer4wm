@@ -124,7 +124,7 @@ function cleanWikitableContent($p_input)
   // Manage its wikisyntax: remove links and formatting.
   $l_remove = array ("[[","]]","'''","''","{{formatnum:");
 
-  $l_regexp = "align=&quot;(.*)\|";
+  $l_regexp = "align=(.*)\|";
   if(preg_match_all("/$l_regexp/siU", $p_input, $matches, PREG_SET_ORDER)) {
     foreach($matches as $match) {
       if ( !in_array( $match[0], $l_remove)) {

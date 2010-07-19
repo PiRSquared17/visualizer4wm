@@ -411,11 +411,11 @@ function motionChart_generateJsFromContent($p_content)
 function motionChart_setJsAndHtml($p_pageName, $p_displayedPageName, $p_projectUrl, $p_javascriptRows, $p_groupName, $p_xAxisCaption, $p_yAxisCaption)
 {
   $l_htmlcode = <<<MYHMTLCODE
-    <div id="chart_div"></div>
     <div id="info" class="noLinkDecoration">
       Data source is
       <a href="http://$p_projectUrl/wiki/$p_pageName">$p_displayedPageName</a> on $p_projectUrl.
     </div>
+    <div id="chart_div"></div>
 MYHMTLCODE;
 
   $l_jscode = <<<MYJSCODE
@@ -496,7 +496,7 @@ function printHTML($p_javaScriptCode="",
   </head>
   <body>
     <div id="mw_header"><a href="./visualizer4wm.php">Wikitable visualizer tool</a><br /><span>Wikimedia toolserver</span></div>
-    $p_htmlCode
+    <div id="main">$p_htmlCode</div>
     <div id="documentation">
     	<tt>{{<a href="./index.html">Visualizer</a>}}</tt> &nbsp;
       &#8734; &nbsp; The data visualizer tool is kindly served to you by the <span class="hidden"><a href="http://toolserver.org/">Wikimedia Toolserver</a>.
@@ -592,11 +592,8 @@ function main()
     $l_jscode=$l_Chart[0];
 
     $l_htmlcode = <<<MYHMTLCODE
-    <p>$l_htmlChart</p>
-    <div id="info" class="noLinkDecoration">
-      Data source is
-      <a href="http://$l_projectUrl/wiki/$l_pageName">$l_displayedPageName</a> on $l_projectUrl.
-    </div>
+    <div id="info" class="noLinkDecoration">Data source is <a href="http://$l_projectUrl/wiki/$l_pageName">$l_displayedPageName</a> on $l_projectUrl.</div>
+    $l_htmlChart
 MYHMTLCODE;
 
     printHTML($l_jscode,$l_htmlcode);

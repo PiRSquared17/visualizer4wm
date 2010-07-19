@@ -495,7 +495,7 @@ function printHTML($p_javaScriptCode="",
     <link rel="stylesheet" href="./visualizer4wm.css" type="text/css" media="screen" />
   </head>
   <body>
-    <div id="mw_header"><a href="./visualizer4wm.php">Wikitable visualizer tool</a></div>
+    <div id="mw_header"><a href="./visualizer4wm.php">Wikitable visualizer tool</a><br /><span>Wikimedia toolserver</span></div>
     $p_htmlCode
     <div id="documentation">
     	<tt>{{<a href="./index.html">Visualizer</a>}}</tt> &nbsp;

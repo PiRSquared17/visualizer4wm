@@ -180,6 +180,9 @@ function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
   # Set the numbers of rows and cols.
   $l_nbOfRows = count($l_data)-1;
   $l_nbOfCols = get("columns",count($l_data[0]));
+  if (''==$l_nbOfCols ||'all'==$l_nbOfCols) {
+    $l_nbOfCols = count($l_data[0]);
+  }
 
   $ChartPackage = 'corechart';
   $l_firstColType = 'string';
@@ -283,7 +286,7 @@ function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
   }
   $l_rows = implode(";\n", $javascriptRows).";";
 
-  $l_height = get("height",'400');
+  $l_height = get("height",'500');
   $l_width = get("width",'1000');
 
   # Set the javaScript.

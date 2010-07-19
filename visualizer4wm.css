@@ -1,3 +1,24 @@
+#mw_header {background: #036 url(./Headerbg.png) no-repeat center left !important; height: 50px !important;}
+
+#mw_header {
+	position: absolute;
+	top: 0;
+	left: 0;
+	margin: 1 0 0 0;
+	border: none;
+	width: 100%;
+	padding: 0.5em 0 0 3.6em;
+	background-color: #003366;
+	color: white;
+
+	font-size: 130%;
+}
+#mw_header a {
+	color: white;
+	text-decoration: none;
+}
+#index, #chart_div {	margin: 3em 0 0 0;}
+
 div#info {background:lightyellow; border:2px solid #ffdead; 
   margin:1em 0em 1em 2.5em; 
   padding:.4em 1em;

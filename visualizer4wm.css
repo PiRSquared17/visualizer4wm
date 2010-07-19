@@ -1,4 +1,4 @@
-#mw_header {background: #036 url(./Headerbg.png) no-repeat center left !important; height: 50px !important;}
+#mw_header {background: #036 url(http://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Statistic_template.svg/105px-Statistic_template.svg.png) no-repeat center left !important; height: 50px !important;}
 
 #mw_header {
 	position: absolute;
@@ -17,6 +17,8 @@
 	color: white;
 	text-decoration: none;
 }
+#mw_header span {font-size: 60%;	margin: 0 0 0 1em;}
+
 #index, #chart_div {	margin: 4em 0 0 0;}
 
 div#info {background:lightyellow; border:2px solid #ffdead; 

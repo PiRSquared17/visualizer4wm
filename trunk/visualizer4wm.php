@@ -299,9 +299,6 @@ function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
 			  });
       }
     </script>
-    <style type="text/css">
-      div#chart_div {width: $l_width px; height: $l_height px;}
-    </style>
 MYJSCODE;
 
   # Set the html.

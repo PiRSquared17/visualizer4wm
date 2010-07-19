@@ -121,6 +121,11 @@ function cleanWikitableContent($p_input)
   $l_regexp = "&lt;ref(.*)\/&gt;";
   $p_input = removeRegexpMatch($l_regexp,$p_input);
 
+  // Manage its wikisyntax: row separators "|-".
+  $p_input=str_replace("----","-",$p_input);
+  $p_input=str_replace("---","-",$p_input);
+  $p_input=str_replace("--","-",$p_input);
+
   // Manage its wikisyntax: remove links and formatting.
   $l_remove = array ("[[","]]","'''","''","{{formatnum:");
 

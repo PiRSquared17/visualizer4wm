@@ -412,7 +412,6 @@ function motionChart_setJsAndHtml($p_pageName, $p_displayedPageName, $p_projectU
 {
   $l_htmlcode = <<<MYHMTLCODE
     <div id="chart_div"></div>
-    <p></p>
     <div id="info" class="noLinkDecoration">
       Data source is
       <a href="http://$p_projectUrl/wiki/$p_pageName">$p_displayedPageName</a> on $p_projectUrl.
@@ -496,7 +495,7 @@ function printHTML($p_javaScriptCode="",
     <link rel="stylesheet" href="./visualizer4wm.css" type="text/css" media="screen" />
   </head>
   <body>
-    <h3>Data Visualizer</h3>
+    <div id="mw_header"><a href="./visualizer4wm.php">Wikitable visualizer tool</a></div>
     $p_htmlCode
     <div id="documentation">
     	<tt>{{<a href="./index.html">Visualizer</a>}}</tt> &nbsp;

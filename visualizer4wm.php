@@ -84,9 +84,8 @@ function getWikiTableFromContent($p_content, $p_templateName)
   }
 
   // Remove the template.
-  $l_tableContent = strstr($l_tableContent, "}}");
-  if (false==$l_tableContent) exit('Error: template ending code "}}" not found after the template opening.');
-  $l_tableContent = substr($l_tableContent, 2);
+  $l_tableContent = strstr($l_tableContent, "!");
+  if (false==$l_tableContent) exit("Error: Wikicode \"!\" not found in the wikitable after the template $p_templateName. The table columns should have titles using.");
 
   // Remove everything after the wikitable.
   $l_endingContent = strstr( $l_tableContent, "\n|}");
@@ -160,6 +159,31 @@ function removeRegexpMatch($p_regexp,$p_input)
       $p_input=str_replace($match[0],'',$p_input);
     }
   }
+  return $p_input;
+}
+
+/**
+ ** @brief Clean the chart title
+ ** @param $p_input The chart title from the url argument title.
+ ** @details Return a clean title.
+ **
+ */
+function cleanChartTitle($p_input)
+{
+
+  // Remove any QINU error.
+  $l_regexp = "UNIQ(.*)QINU";
+  $p_input = removeRegexpMatch($l_regexp,$p_input);
+
+  // Manage its wikisyntax: remove links and formatting.
+  $l_remove = array ("[[","]]","'''","''");
+
+  foreach($l_remove as $s) {
+    $p_input=str_replace( $s,'',$p_input);
+  }
+
+  $p_input=str_replace("'","\'",$p_input);
+
   return $p_input;
 }
 
@@ -580,6 +604,10 @@ function main()
 
     # Get the chart title.
     $l_chartTitle = get("title", $l_displayedPageName);
+    if ( $l_chartTitle != $l_displayedPageName)
+    {
+      $l_chartTitle=cleanChartTitle($l_chartTitle);
+    }
 
     # Try to get data from content or return an error.
     $l_dataLines = getWikiTableFromContent($l_pageContent,$l_templateName);

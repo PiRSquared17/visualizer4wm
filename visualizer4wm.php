@@ -85,7 +85,7 @@ function getWikiTableFromContent($p_content, $p_templateName)
 
   // Remove the template.
   $l_tableContent = strstr($l_tableContent, "!");
-  if (false==$l_tableContent) exit("Error: Wikicode \"!\" not found in the wikitable after the template $p_templateName. The table columns should have titles using.");
+  if (false==$l_tableContent) exit("Error: Wikicode \"!\" not found in the wikitable after the template $p_templateName. The table columns should have titles using \"!\" instead of \"|\".");
 
   // Remove everything after the wikitable.
   $l_endingContent = strstr( $l_tableContent, "\n|}");

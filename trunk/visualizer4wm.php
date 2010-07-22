@@ -177,11 +177,17 @@ function cleanChartTitle($p_input)
 
   // Manage its wikisyntax: remove links and formatting.
   $l_remove = array ("[[","]]","'''","''", "<br />", "<br>", "<small>", "</small>");
-
   foreach($l_remove as $s) {
     $p_input=str_replace( $s,'',$p_input);
   }
 
+  // Manage its wikisyntax: replace <br> with space.
+  $l_remove = array ("<br />", "<br>");
+  foreach($l_remove as $s) {
+    $p_input=str_replace( $s,' ',$p_input);
+  }
+
+  // Manage its simple quotes.
   $p_input=str_replace("'","\'",$p_input);
 
   return $p_input;

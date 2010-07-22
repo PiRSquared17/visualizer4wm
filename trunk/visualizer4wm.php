@@ -128,6 +128,20 @@ function cleanWikitableContent($p_input)
   // Manage its wikisyntax: remove links and formatting.
   $l_remove = array ("[[","]]","'''","''","{{formatnum:");
 
+  $l_regexp = "style=(.*)\|";
+  if(preg_match_all("/$l_regexp/siU", $p_input, $matches, PREG_SET_ORDER)) {
+    foreach($matches as $match) {
+      if ( !in_array( $match[0], $l_remove)) {
+	array_push($l_remove, $match[0]);
+      }
+    }
+  }
+  foreach($l_remove as $s) {
+    $p_input=str_replace( $s,'',$p_input);
+  }
+
+  // Manage its wikisyntax: remove alignment.
+  $l_remove = array ();
   $l_regexp = "align=(.*)\|";
   if(preg_match_all("/$l_regexp/siU", $p_input, $matches, PREG_SET_ORDER)) {
     foreach($matches as $match) {

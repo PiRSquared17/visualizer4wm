@@ -176,7 +176,7 @@ function cleanChartTitle($p_input)
   $p_input = removeRegexpMatch($l_regexp,$p_input);
 
   // Manage its wikisyntax: remove links and formatting.
-  $l_remove = array ("[[","]]","'''","''");
+  $l_remove = array ("[[","]]","'''","''", "<br />", "<br>", "<small>", "</small>");
 
   foreach($l_remove as $s) {
     $p_input=str_replace( $s,'',$p_input);

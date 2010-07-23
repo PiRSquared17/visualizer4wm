@@ -24,6 +24,18 @@ function get($p_name, $p_default=null)
 
 
 /**
+ ** @brief Set the system messages
+ ** @details Get language from url argument and return its messages
+ */
+function setMessages()
+{
+  $lang=get("lang", "en");
+  require_once("./visualizer4wm.i18n.php");
+  return $messages[$lang];
+}
+
+
+/**
  ** @brief Get the page content with MediaWiki API
  ** @param $p_pageName The page name
  ** @param $p_projectUrl The project url, eg. en.wikipedia.org
@@ -498,12 +510,13 @@ MYJSCODE;
 /**
  ** @brief Echo HTML document
  ** @param $p_javaScriptCode 
- ** @param $p_htmlCode 
+ ** @param $p_htmlCode
+ ** @param $p_title Document title and header
  ** @details Print valid XHTML
  **
  */
 function printHTML($p_javaScriptCode="",
-                   $p_htmlCode="")
+                   $p_htmlCode="", $p_title="Wikitable Visualizer")
 {
 
   if (''==$p_htmlCode) {
@@ -539,12 +552,12 @@ function printHTML($p_javaScriptCode="",
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
-    <title>Data Visualizer: visualize the data published on a wikipage</title>
+    <title>$p_title - visualize the data published on a wikipage</title>
     $p_javaScriptCode
     <link rel="stylesheet" href="./visualizer4wm.css" type="text/css" media="screen" />
   </head>
   <body>
-    <div id="mw_header"><a href="./visualizer4wm.php">Wikitable visualizer tool</a><br /><span>Wikimedia toolserver</span></div>
+    <div id="mw_header"><a href="./visualizer4wm.php">$p_title</a><br /><span>Wikimedia toolserver</span></div>
     <div id="main">$p_htmlCode</div>
     <div id="documentation">
     	<tt>{{<a href="./index.html">Visualizer</a>}}</tt> &nbsp;
@@ -572,6 +585,9 @@ function main()
     exit(printHTML());
   }
   $l_displayedPageName = str_replace('_',' ',$l_pageName);
+
+  $l_msg=setMessages();
+  $l_title= $l_msg['visualizer4mw'];
 
   # Set the local parameters.
   $l_parameters = array(
@@ -644,12 +660,15 @@ function main()
     $l_htmlChart=$l_Chart[1];
     $l_jscode=$l_Chart[0];
 
+    $l_info=str_replace('$1', "<a href='http://$l_projectUrl/wiki/$l_pageName'>$l_displayedPageName</a>", $l_msg['visualizer4mw-info']);
+    $l_info=str_replace('$2', $l_projectUrl, $l_info);
+
     $l_htmlcode = <<<MYHMTLCODE
-    <div id="info" class="noLinkDecoration">Data source is <a href="http://$l_projectUrl/wiki/$l_pageName">$l_displayedPageName</a> on $l_projectUrl.</div>
+    <div id="info" class="noLinkDecoration">$l_info</div>
     $l_htmlChart
 MYHMTLCODE;
 
-    printHTML($l_jscode,$l_htmlcode);
+    printHTML($l_jscode,$l_htmlcode,$l_title);
   }
 }
 

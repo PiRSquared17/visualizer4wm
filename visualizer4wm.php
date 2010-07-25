@@ -141,19 +141,25 @@ function cleanWikitableContent($p_input)
   $p_input=str_replace("---","-",$p_input);
   $p_input=str_replace("--","-",$p_input);
 
-  // Manage its wikisyntax: links.
-  $p_regexp = "\[\[(.*)\|(.*)\]\]";
-  if(preg_match_all("/$p_regexp/siU", $p_input, $matches, PREG_SET_ORDER)) {
-    foreach($matches as $match) {
-      $p_input=str_replace( $match[0],$match[2],$p_input);
-    }
-  }
-
-  // Manage its wikisyntax: remove links and formatting.
-  $l_remove = array ("[[","]]","'''","''","{{formatnum:", "&lt;small&gt;", "&lt;/small&gt;");
-
+  // Manage its wikisyntax: remove formatting.
+  $l_remove = array ("'''","''","{{formatnum:", "&lt;small&gt;", "&lt;/small&gt;");
   foreach($l_remove as $s) {
     $p_input=str_replace( $s,'',$p_input);
+  }
+
+  // Manage its wikisyntax: wikilinks.
+  $p_regexp = "\[\[(.*)\]\]";
+  if(preg_match_all("/$p_regexp/siU", $p_input, $matches, PREG_SET_ORDER)) {
+    foreach($matches as $match) {
+      $l_linktext = strstr($match[1], "|");
+      if (false==$l_linktext) {
+	$p_input=str_replace( $match[0],$match[1],$p_input);
+      }
+      else {
+	$l_linktext = trim(substr($l_linktext, 1));
+	$p_input=str_replace( $match[0],$l_linktext,$p_input);
+      }
+    }
   }
 
   $p_input=str_replace("'","\'",$p_input);

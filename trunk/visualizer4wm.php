@@ -125,12 +125,16 @@ function getWikiTableFromContent($p_content, $p_templateName)
  */
 function cleanWikitableContent($p_input)
 {
-  // Manage its wikisyntax: remove references.
-  $l_regexp = "&lt;ref(.*)&gt;(.*)&lt;\/ref&gt;";
-  $p_input = removeRegexpMatch($l_regexp,$p_input);
-
-  $l_regexp = "&lt;ref(.*)\/&gt;";
-  $p_input = removeRegexpMatch($l_regexp,$p_input);
+  // Manage its wikisyntax: remove references, comments, style and alignment.
+  $l_regexps = array("&lt;ref(.*)&gt;(.*)&lt;\/ref&gt;",
+		      "&lt;ref(.*)\/&gt;",
+		      "&lt;!--(.*)--&gt;",
+		      "align=(.*)\|",
+		      "style=(.*)\|"
+  );
+  foreach($l_regexps as $l_regexp) {
+    $p_input=removeRegexpMatch($l_regexp,$p_input);
+  }
 
   // Manage its wikisyntax: row separators "|-".
   $p_input=str_replace("----","-",$p_input);
@@ -140,28 +144,6 @@ function cleanWikitableContent($p_input)
   // Manage its wikisyntax: remove links and formatting.
   $l_remove = array ("[[","]]","'''","''","{{formatnum:");
 
-  $l_regexp = "style=(.*)\|";
-  if(preg_match_all("/$l_regexp/siU", $p_input, $matches, PREG_SET_ORDER)) {
-    foreach($matches as $match) {
-      if ( !in_array( $match[0], $l_remove)) {
-	array_push($l_remove, $match[0]);
-      }
-    }
-  }
-  foreach($l_remove as $s) {
-    $p_input=str_replace( $s,'',$p_input);
-  }
-
-  // Manage its wikisyntax: remove alignment.
-  $l_remove = array ();
-  $l_regexp = "align=(.*)\|";
-  if(preg_match_all("/$l_regexp/siU", $p_input, $matches, PREG_SET_ORDER)) {
-    foreach($matches as $match) {
-      if ( !in_array( $match[0], $l_remove)) {
-	array_push($l_remove, $match[0]);
-      }
-    }
-  }
   foreach($l_remove as $s) {
     $p_input=str_replace( $s,'',$p_input);
   }
@@ -180,11 +162,19 @@ function cleanWikitableContent($p_input)
  */
 function removeRegexpMatch($p_regexp,$p_input)
 {
+  $l_remove = array ();
   if(preg_match_all("/$p_regexp/siU", $p_input, $matches, PREG_SET_ORDER)) {
     foreach($matches as $match) {
-      $p_input=str_replace($match[0],'',$p_input);
+      if ( !in_array( $match[0], $l_remove)) {
+	array_push($l_remove, $match[0]);
+      }
     }
   }
+
+  foreach($l_remove as $s) {
+    $p_input=str_replace( $s,'',$p_input);
+  }
+
   return $p_input;
 }
 
@@ -673,4 +663,3 @@ MYHMTLCODE;
 }
 
 main();
-?>

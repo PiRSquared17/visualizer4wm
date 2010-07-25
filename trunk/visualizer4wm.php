@@ -141,6 +141,14 @@ function cleanWikitableContent($p_input)
   $p_input=str_replace("---","-",$p_input);
   $p_input=str_replace("--","-",$p_input);
 
+  // Manage its wikisyntax: links.
+  $p_regexp = "\[\[(.*)\|(.*)\]\]";
+  if(preg_match_all("/$p_regexp/siU", $p_input, $matches, PREG_SET_ORDER)) {
+    foreach($matches as $match) {
+      $p_input=str_replace( $match[0],$match[2],$p_input);
+    }
+  }
+
   // Manage its wikisyntax: remove links and formatting.
   $l_remove = array ("[[","]]","'''","''","{{formatnum:", "&lt;small&gt;", "&lt;/small&gt;");
 

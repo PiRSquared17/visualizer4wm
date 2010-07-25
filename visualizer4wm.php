@@ -142,7 +142,7 @@ function cleanWikitableContent($p_input)
   $p_input=str_replace("--","-",$p_input);
 
   // Manage its wikisyntax: remove links and formatting.
-  $l_remove = array ("[[","]]","'''","''","{{formatnum:");
+  $l_remove = array ("[[","]]","'''","''","{{formatnum:", "&lt;small&gt;", "&lt;/small&gt;");
 
   foreach($l_remove as $s) {
     $p_input=str_replace( $s,'',$p_input);

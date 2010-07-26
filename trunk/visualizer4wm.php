@@ -130,7 +130,8 @@ function cleanWikitableContent($p_input)
 		      "&lt;ref(.*)\/&gt;",
 		      "&lt;!--(.*)--&gt;",
 		      "align=(.*)\|",
-		      "style=(.*)\|"
+		      "style=(.*)\|",
+		      "width=(.*)\|"
   );
   foreach($l_regexps as $l_regexp) {
     $p_input=removeRegexpMatch($l_regexp,$p_input);

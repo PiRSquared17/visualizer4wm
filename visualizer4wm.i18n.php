@@ -38,7 +38,7 @@ $messages['hu'] = array(
  * @author Mathonius
  */
 $messages['nl'] = array(
-	'visualizer4mw' => 'Hulpmiddel om Wikitable te visualiseren',
+	'visualizer4mw' => 'Hulpmiddel om wikitabellen te visualiseren',
 	'visualizer4mw-info' => 'De broncode is te vinden op $1 op $2.'
 );
 

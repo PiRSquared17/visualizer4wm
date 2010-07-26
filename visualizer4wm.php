@@ -95,6 +95,23 @@ function getWikiTableFromContent($p_content, $p_templateName)
     return "error1";
   }
 
+  // Handle multiple tables per page
+  $l_id=get('id',1);
+  if (1!=$l_id) {
+    for ($i=1; $i<$l_id; $i++) {
+	$l_tableContent = substr($l_tableContent, 1);
+        $l_tableContent = strstr($l_tableContent, "{{".ucfirst($p_templateName));
+        if (false==$l_tableContent)
+        {
+          $l_tableContent = strstr($l_tableContent, "{{".lcfirst($p_templateName));
+        }
+       if (false==$l_tableContent)
+       {
+         return "error1";
+       }
+    }
+  }
+
   // Remove the template.
   $l_tableContent = strstr($l_tableContent, "!");
   if (false==$l_tableContent) exit("Error: Wikicode \"!\" not found in the wikitable after the template $p_templateName. The table columns should have titles using \"!\" instead of \"|\".");

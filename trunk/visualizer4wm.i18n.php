@@ -19,7 +19,7 @@ $messages['en'] = array(
 );
 
 /** French (Français)
- * @author 
+ * @author Al Maghi
  */
 $messages['fr'] = array(
 	'visualizer4mw' => 'Outil de visualisation de tableaux',
@@ -27,9 +27,18 @@ $messages['fr'] = array(
 );
 
 /** Hungarian (Magyar)
- * @author 
+ * @author Binaris
  */
 $messages['hu'] = array(
 	'visualizer4mw' => 'Diagramvarázsló',
 	'visualizer4mw-info' => 'Az adatok forrása a $2 $1 szócikke.',
 );
+
+/** NL
+ * @author Mathonius
+ */
+$messages['nl'] = array(
+	'visualizer4mw' => 'Hulpmiddel om Wikitable te visualiseren',
+	'visualizer4mw-info' => 'De broncode is te vinden op $1 op $2.'
+);
+

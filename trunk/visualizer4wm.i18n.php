@@ -34,6 +34,15 @@ $messages['hu'] = array(
 	'visualizer4mw-info' => 'Az adatok forrása a $2 $1 szócikke.',
 );
 
+/** Italian
+ * @author Vituzzu
+ */
+$messages['it'] = array(
+	'visualizer4mw' => 'Tool di visualizzazione di tabelle wiki',
+	'visualizer4mw-info' => 'dati tratti da $1 su $2.',
+);
+Tool di visualizzazione di tabelle wiki
+
 /** NL
  * @author Mathonius
  */

@@ -38,10 +38,9 @@ $messages['hu'] = array(
  * @author Vituzzu
  */
 $messages['it'] = array(
-	'visualizer4mw' => 'Tool di visualizzazione di tabelle wiki',
+	'visualizer4mw' => 'Strumento di visualizzazione di tabelle wiki',
 	'visualizer4mw-info' => 'dati tratti da $1 su $2.',
 );
-Tool di visualizzazione di tabelle wiki
 
 /** NL
  * @author Mathonius

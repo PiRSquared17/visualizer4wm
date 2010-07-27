@@ -40,7 +40,7 @@ $messages['hu'] = array(
 $messages['it'] = array(
 	'visualizer4mw' => 'Strumento di visualizzazione di tabelle wiki',
 	'visualizer4mw-info' => 'Dati tratti da $1 su $2.',
-	'visualizer4mw-footer' => 'Lo strumento di visualizzazione dati è ospitato su Wikimedia Toolserver. Lo strumento è basato su MediaWiki e sulle Vizualisation API.'
+	'visualizer4mw-footer' => 'Lo strumento di visualizzazione dati è ospitato su Wikimedia Toolserver. Lo strumento è basato su MediaWiki e sulle Visualization API.'
 );
 
 /** NL

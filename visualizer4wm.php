@@ -142,13 +142,15 @@ function getWikiTableFromContent($p_content, $p_templateName)
  */
 function cleanWikitableContent($p_input)
 {
-  // Manage its wikisyntax: remove references, comments, style and alignment.
+  // Manage its wikisyntax: remove references, comments, style, alignment and sub/sup.
   $l_regexps = array("&lt;ref(.*)&gt;(.*)&lt;\/ref&gt;",
 		      "&lt;ref(.*)\/&gt;",
 		      "&lt;!--(.*)--&gt;",
 		      "align=(.*)\|",
 		      "style=(.*)\|",
-		      "width=(.*)\|"
+		      "width=(.*)\|",
+		      "&lt;sup&gt;(.*)&lt;\/sup&gt;",
+		      "&lt;sub&gt;(.*)&lt;\/sub&gt;"
   );
   foreach($l_regexps as $l_regexp) {
     $p_input=removeRegexpMatch($l_regexp,$p_input);

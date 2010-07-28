@@ -43,6 +43,7 @@ $messages['cs'] = array(
 $messages['fa'] = array(
         'visualizer4mw' => 'ابزار نمایش‌دهندهٔ ویکی‌جدول',
         'visualizer4mw-info' => 'منبع داده‌ها $1 در $2 است.',
+	'is_rtl'=> '1'
 );
 
 /** Arabic
@@ -51,6 +52,7 @@ $messages['fa'] = array(
 $messages['ar'] = array(
         'visualizer4mw' => 'أداة إرائه ويکي جدول',
         'visualizer4mw-info' => 'مصدر البيانات هو $1 على $2.',
+	'is_rtl'=> '1'
 );
 
 /** French (Français)

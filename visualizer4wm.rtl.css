@@ -10,10 +10,10 @@ immediately as long as you keep this window open. */
 	position: absolute;
 	top: 0;
 	left: 0;
-	margin: 1 0 0 0;
+	margin: 0 5em 0 0;
 	border: none;
-	width: 100%;
-	padding: 0.5em 0em 0em 0em;
+	width: 94%;
+	padding: 0.5em 6% 0em 0em;
 	background-color: #003366;
 	color: white;
 
@@ -23,12 +23,12 @@ immediately as long as you keep this window open. */
 	color: white;
 	text-decoration: none;
 }
-#mw_header span {font-size: 60%;	margin: 0 0 0 1em;}
+#mw_header span {font-size: 60%;	margin: 0 3em 0 0;}
 
 #main { margin: 5em 0 0 0;}
 
 div#info {background:lightyellow; border:2px solid #ffdead; 
-  margin:6em 0em 1em 2.5em; 
+  margin:6em 5em 1em 2.5em; 
   padding:.4em 1em;
   display:inline;
   -moz-border-radius:1em;

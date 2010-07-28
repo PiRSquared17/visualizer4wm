@@ -30,7 +30,11 @@ function get($p_name, $p_default=null)
 function setMessages($lang)
 {
   require_once("./visualizer4wm.i18n.php");
-  return $messages[$lang];
+  if(isset($messages[$lang])) {
+    return $messages[$lang];
+  } else {
+    return $messages['en'];
+  }
 }
 
 

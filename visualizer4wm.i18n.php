@@ -45,6 +45,14 @@ $messages['fa'] = array(
         'visualizer4mw-info' => 'منبع داده‌ها $1 در $2 است.',
 );
 
+/** Arabic
+ * @author ebraminio
+ */
+$messages['ar'] = array(
+        'visualizer4mw' => 'أداة إرائه ويکي جدول',
+        'visualizer4mw-info' => 'مصدر البيانات هو $1 على $2.',
+);
+
 /** French (Français)
  * @author Al Maghi
  */

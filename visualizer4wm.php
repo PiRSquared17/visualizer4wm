@@ -27,9 +27,8 @@ function get($p_name, $p_default=null)
  ** @brief Set the system messages
  ** @details Get language from url argument and return its messages
  */
-function setMessages()
+function setMessages($lang)
 {
-  $lang=get("lang", "en");
   require_once("./visualizer4wm.i18n.php");
   return $messages[$lang];
 }
@@ -536,11 +535,12 @@ MYJSCODE;
  ** @param $p_javaScriptCode 
  ** @param $p_htmlCode
  ** @param $p_title Document title and header
+ ** @param $p_ltr left-to-right or rtl language
  ** @details Print valid XHTML
  **
  */
 function printHTML($p_javaScriptCode="",
-                   $p_htmlCode="", $p_title="Wikitable Visualizer")
+                   $p_htmlCode="", $p_title="Wikitable Visualizer", $p_ltr="")
 {
 
   if (''==$p_htmlCode) {
@@ -578,7 +578,7 @@ function printHTML($p_javaScriptCode="",
     <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
     <title>$p_title - visualize the data published on a wikipage</title>
     $p_javaScriptCode
-    <link rel="stylesheet" href="./visualizer4wm.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="./visualizer4wm$p_ltr.css" type="text/css" media="screen" />
   </head>
   <body>
     <div id="mw_header"><a href="./visualizer4wm.php">$p_title</a><br /><span>Wikimedia toolserver</span></div>
@@ -610,8 +610,6 @@ function main()
   }
   $l_displayedPageName = str_replace('_',' ',$l_pageName);
 
-  $l_msg=setMessages();
-  $l_title= $l_msg['visualizer4mw'];
 
   # Set the local parameters.
   $l_parameters = array(
@@ -626,7 +624,18 @@ function main()
 					  'wikiversity.org'),
 
     'chart types'		=>	array('pie','bar', 'col', 'line', 'scatter', 'area', 'geomap', 'intensitymap', 'sparkline'),
+
+    'RTL-languages'		=>	array('ar','he', 'fa'),
   );
+
+  # Get the language.
+  $lang=get("lang", "en");
+  $l_msg=setMessages($lang);
+  $l_title= $l_msg['visualizer4mw'];
+  if ( in_array( $lang, $l_parameters['RTL-languages']))
+  {
+    $l_ltr=".rtl";
+  }
 
   # Get the project url and check its domain name.
   $l_projectUrl = get("project", "en.wikipedia.org");
@@ -692,7 +701,7 @@ function main()
     $l_htmlChart
 MYHMTLCODE;
 
-    printHTML($l_jscode,$l_htmlcode,$l_title);
+    printHTML($l_jscode,$l_htmlcode,$l_title,$l_ltr);
   }
 }
 

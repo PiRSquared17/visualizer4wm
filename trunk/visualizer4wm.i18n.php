@@ -26,7 +26,7 @@ $messages['en'] = array(
  */
 $messages['ca'] = array(
 	'visualizer4mw' => 'Eina de visualització de taules',
-	'visualizer4mw-info' => 'La font de les dades és $1 a $2.'
+	'visualizer4mw-info' => 'La font de les dades és $1 de $2.'
 );
 
 /** Czech CS

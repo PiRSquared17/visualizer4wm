@@ -66,7 +66,7 @@ $messages['nl'] = array(
 /** Russian (Русский)
  * @author Rave@SUL 19:39
  */
-$messages['ru'] = array( 19:39
-'visualizer4mw' => 'Инструмент визуализации вики-таблиц',
-'visualizer4mw-info' => 'Источник данных — $1, проект $2.'
+$messages['ru'] = array(
+	'visualizer4mw' => 'Инструмент визуализации вики-таблиц',
+	'visualizer4mw-info' => 'Источник данных — $1, проект $2.'
 );

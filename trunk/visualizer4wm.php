@@ -632,7 +632,7 @@ function main()
   $lang=get("lang", "en");
   $l_msg=setMessages($lang);
   $l_title= $l_msg['visualizer4mw'];
-  if ( in_array( $lang, $l_parameters['RTL-languages']))
+  if (1==$l_msg['is_rtl'])
   {
     $l_ltr=".rtl";
   }

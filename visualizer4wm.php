@@ -110,7 +110,7 @@ function getWikiTableFromContent($p_content, $p_templateName)
         }
        if (false==$l_tableContent)
        {
-         return "error1";
+         return "error3";
        }
     }
   }
@@ -689,6 +689,9 @@ function main()
     }
     if ('error2'==$l_dataLines) {
       exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the line: <tt>|}</tt>");
+    }
+    if ('error3'==$l_dataLines) {
+      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not include the template ".$l_templateName." <b>as many times as requested</b>.<br />Check the template id parameter <tt>id=</tt>");
     }
 
     # Generate the chart js and html.   

@@ -29,6 +29,14 @@ $messages['cs'] = array(
 	'visualizer4mw-info' => 'Zdrojem dat je $1 na $2.'
 );
 
+/** Persian
+ * @author ebraminio
+ */
+$messages['fa'] = array(
+        'visualizer4mw' => 'ابزار نمایش‌دهندهٔ ویکی‌جدول',
+        'visualizer4mw-info' => 'منبع داده‌ها $1 در $2 است.',
+);
+
 /** French (Français)
  * @author Al Maghi
  */
@@ -61,7 +69,6 @@ $messages['nl'] = array(
 	'visualizer4mw' => 'Hulpmiddel om wikitabellen te visualiseren',
 	'visualizer4mw-info' => 'De broncode is te vinden op $1 op $2.'
 );
-
 
 /** Russian (Русский)
  * @author Rave@SUL 19:39

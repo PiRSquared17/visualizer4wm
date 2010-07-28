@@ -13,9 +13,20 @@
 
 $messages = array();
 
+/** English
+ * @author Al Maghi
+ */
 $messages['en'] = array(
 	'visualizer4mw' => 'Wikitable visualizer tool',
 	'visualizer4mw-info' => 'Data source is $1 on $2.',
+);
+
+/** Czech CS
+ * @author Juan de Vojníkov
+ */
+$messages['cs'] = array(
+	'visualizer4mw' => 'Nástroj na vizualizaci tabulek',
+	'visualizer4mw-info' => 'Zdrojem dat je $1 na $2.'
 );
 
 /** French (Français)
@@ -51,3 +62,11 @@ $messages['nl'] = array(
 	'visualizer4mw-info' => 'De broncode is te vinden op $1 op $2.'
 );
 
+
+/** Russian (Русский)
+ * @author Rave@SUL 19:39
+ */
+$messages['ru'] = array( 19:39
+'visualizer4mw' => 'Инструмент визуализации вики-таблиц',
+'visualizer4mw-info' => 'Источник данных — $1, проект $2.'
+);

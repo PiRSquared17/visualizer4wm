@@ -21,6 +21,14 @@ $messages['en'] = array(
 	'visualizer4mw-info' => 'Data source is $1 on $2.',
 );
 
+/** Catalan
+ * @author Vriullop
+ */
+$messages['ca'] = array(
+	'visualizer4mw' => 'Eina de visualització de taules',
+	'visualizer4mw-info' => 'La font de les dades és $1 a $2.'
+);
+
 /** Czech CS
  * @author Juan de Vojníkov
  */

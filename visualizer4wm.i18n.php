@@ -80,7 +80,7 @@ $messages['it'] = array(
 	'visualizer4mw-footer' => 'Lo strumento di visualizzazione dati è ospitato su Wikimedia Toolserver. Lo strumento è basato su MediaWiki e sulle Visualization API.'
 );
 
-/** NL
+/** Dutch 
  * @author Mathonius
  */
 $messages['nl'] = array(
@@ -88,7 +88,7 @@ $messages['nl'] = array(
 	'visualizer4mw-info' => 'De broncode is te vinden op $1 op $2.'
 );
 
-/** PL
+/** Polish
  * @author Herr Kriss
  */
 $messages['pl'] = array(
@@ -97,9 +97,17 @@ $messages['pl'] = array(
 );
 
 /** Russian (Русский)
- * @author Rave@SUL 19:39
+ * @author Rave@SUL
  */
 $messages['ru'] = array(
 	'visualizer4mw' => 'Инструмент визуализации вики-таблиц',
 	'visualizer4mw-info' => 'Источник данных — $1, проект $2.'
+);
+
+/** Silesian (Slunski)
+ * @author Ynst
+ */
+$messages['szl'] = array(
+	'visualizer4mw' => "Norzyńdzjy do zobyjrzynja uobrozkůw ze wikitabyl",
+	'visualizer4mw-info' => "Zdrzadło to $1 we $2."
 );

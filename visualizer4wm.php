@@ -441,7 +441,7 @@ function getDataFromWikitableLines($p_dataLines)
  ** @brief motionChart only - Generate javascript rows of data from the page content
  ** @param $p_content The raw content of the page
  ** @details For motion chart:
- ** {{visualize|
+ ** {{motionchart|
  **  {{dataset| en | 2003/0/1 | 10000 | 20000 | East }}
  **  {{dataset| fr | 2003/0/1 | 5000 | 10000 | West }}
  **
@@ -454,7 +454,7 @@ function motionChart_generateJsFromContent($p_content)
 {
 
   $datasetPatten = "{{\s*dataset\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*\|\s*([^|]*?)\s*}}";
-  $pattern = sprintf("/{{\s*visualize\s*\|.*?(%s)+.*}}/misSU", $datasetPatten);
+  $pattern = sprintf("/{{\s*motionchart\s*\|.*?(%s)+.*}}/misSU", $datasetPatten);
   preg_match_all($pattern, $p_content, $matches);
   if (!count($matches))
     return null;
@@ -568,7 +568,7 @@ function printHTML($p_javaScriptCode="",
 		  geomap</a>,
 	<a href="?page=Template:Visualizer/IntensityMap&amp;project=en.wikipedia.org&amp;tpl=visualizer&amp;ct=intensitymap">
 		  intensitymap</a> or
-	<a href="?page=User:Al_Maghi/Visualize_Wikipedias_growth_up_to_2010&amp;project=en.wikipedia.org&amp;tpl=visualize&amp;y=Bytes+per+article&amp;x=Articles&amp;group=Wikipedias">
+	<a href="?page=User:Al_Maghi/Visualize_Wikipedias_growth_up_to_2010&amp;project=en.wikipedia.org&amp;tpl=motionchart&amp;y=Bytes+per+article&amp;x=Articles&amp;group=Wikipedias">
 		  motion</a> charts.
       </div>';
   }
@@ -652,10 +652,10 @@ function main()
   $l_pageContent = getContentFromMediaWiki($l_pageName,$l_projectUrl);
 
   # Get the template name.
-  $l_templateName = get("tpl", "visualize");
+  $l_templateName = get("tpl", "visualizer");
 
   # Generate the chart and print it.
-  if ("visualize"==$l_templateName)
+  if ("motionchart"==$l_templateName)
   {
     $l_javascriptRows = motionChart_generateJsFromContent($l_pageContent);
     if (null==$l_javascriptRows) {

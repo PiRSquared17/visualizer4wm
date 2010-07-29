@@ -88,6 +88,14 @@ $messages['nl'] = array(
 	'visualizer4mw-info' => 'De broncode is te vinden op $1 op $2.'
 );
 
+/** PL
+ * @author Herr Kriss
+ */
+$messages['pl'] = array(
+	'visualizer4mw' => 'Narzędzie do wizualizacji wikitabel',
+	'visualizer4mw-info' => 'Źródło danych to $1 na $2.'
+);
+
 /** Russian (Русский)
  * @author Rave@SUL 19:39
  */

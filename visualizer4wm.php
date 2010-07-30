@@ -595,9 +595,9 @@ function main()
   }
   $l_displayedPageName = str_replace('_',' ',$l_pageName);
 
-  # Set the local parameters.
+  # Set the authorised values for parameters.
   $l_parameters = array(
-    'authorised domains'	=>	array('wikipedia.org',
+    'domains'		=>	array('wikipedia.org',
 					  'wikimedia.org',
 					  'wikibooks.org',
 					  'wikiquote.org',
@@ -606,14 +606,13 @@ function main()
 					  'wiktionary.org',
 					  'wikisource.org',
 					  'wikiversity.org'),
-
-    'chart types'		=>	array('pie','bar', 'col', 'line', 'scatter', 'area', 'geomap', 'intensitymap', 'sparkline'),
+    'chart types'	=>	array('pie','bar', 'col', 'line', 'scatter', 'area', 'geomap', 'intensitymap', 'sparkline'),
   );
 
   # Get the project url and check its domain name.
   $l_projectUrl = get("project", "en.wikipedia.org");
   $l_projectDomain = substr(strstr($l_projectUrl, '.'),1);
-  if ( !in_array( $l_projectDomain, $l_parameters['authorised domains'])) {
+  if ( !in_array( $l_projectDomain, $l_parameters['domains'])) {
     exit("Sorry but <a href=\"http://$l_projectDomain\">$l_projectDomain</a> is not an authorised domain name. (Contact us if you want to authorise a new domain name.)<br />The <tt>project</tt> parameter should be something such as en.wikipedia.org.");
   }
 

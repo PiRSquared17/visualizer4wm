@@ -27,14 +27,23 @@ function get($p_name, $p_default=null)
  ** @brief Set the system messages
  ** @details Get language from url argument and return its messages
  */
-function setMessages($lang)
+function setMessages($p_projectUrl,$p_pageName,$p_displayedPageName)
 {
   require_once("./visualizer4wm.i18n.php");
+  $lang=get("lang", "en");
+  $l_rtlCode="";
+
   if(isset($messages[$lang])) {
-    return $messages[$lang];
+    $l_msg = $messages[$lang];
+    if ('yes'==$l_msg['is_rtl']) { $l_rtlCode=".rtl"; }
   } else {
-    return $messages['en'];
+    $l_msg = $messages['en'];
   }
+  $l_msg['is_rtl']=$l_rtlCode;
+  $l_msg['visualizer4mw-info']=str_replace('$1', "<a href='http://$p_projectUrl/wiki/$p_pageName'>$p_displayedPageName</a>", $l_msg['visualizer4mw-info']);
+  $l_msg['visualizer4mw-info']=str_replace('$2', $p_projectUrl, $l_msg['visualizer4mw-info']);
+
+  return $l_msg;
 }
 
 
@@ -591,7 +600,6 @@ function main()
   }
   $l_displayedPageName = str_replace('_',' ',$l_pageName);
 
-
   # Set the local parameters.
   $l_parameters = array(
     'authorised domains'	=>	array('wikipedia.org',
@@ -607,12 +615,6 @@ function main()
     'chart types'		=>	array('pie','bar', 'col', 'line', 'scatter', 'area', 'geomap', 'intensitymap', 'sparkline'),
   );
 
-  # Get the language and its direction.
-  $lang=get("lang", "en");
-  $l_msg=setMessages($lang);
-  $l_ltr="";
-  if ('yes'==$l_msg['is_rtl']) { $l_ltr=".rtl"; }
-
   # Get the project url and check its domain name.
   $l_projectUrl = get("project", "en.wikipedia.org");
   $l_projectDomain = substr(strstr($l_projectUrl, '.'),1);
@@ -626,9 +628,9 @@ function main()
   # Get the template name.
   $l_templateName = get("tpl", "visualizer");
 
-  # Generate the js for motion chart.
   if ("motionchart"==$l_templateName)
   {
+    # Generate the js code for motion chart.
     $l_javascriptRows = motionChart_generateJsFromContent($l_pageContent);
     if (null==$l_javascriptRows) {
       exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> is not using correctly {{dataset}} and {{visualize}}.<br />Check the template parameter <tt>tpl=$l_templateName</tt>");
@@ -638,7 +640,6 @@ function main()
     $l_groupName     = get("group", "Labels");
     $l_jscode = motionChart_setJs($l_javascriptRows, $l_groupName, $l_xAxisCaption, $l_yAxisCaption);
   }
-  # Generate the js for other charts.
   else
   {
     # Get the chart type and check it.
@@ -647,14 +648,7 @@ function main()
       exit("Sorry but the chart type \"$l_chartType\" is not valid.");
     }
 
-    # Get the chart title.
-    $l_chartTitle = get("title", $l_displayedPageName);
-    if ( $l_chartTitle != $l_displayedPageName)
-    {
-      $l_chartTitle=cleanChartTitle($l_chartTitle);
-    }
-
-    # Try to get data from content or return an error.
+    # Try to get data from content or exit.
     $l_dataLines = getWikiTableFromContent($l_pageContent,$l_templateName);
     if (!is_array($l_dataLines))
     {
@@ -671,19 +665,26 @@ function main()
       }
     }
 
+    # Get the chart title.
+    $l_chartTitle = get("title", $l_displayedPageName);
+    if ( $l_chartTitle != $l_displayedPageName)
+    {
+      $l_chartTitle=cleanChartTitle($l_chartTitle);
+    }
+
+    # Generate the js code.
     $l_jscode=generateChartFromTableLines($l_dataLines, $l_chartType, $l_chartTitle);
   }
 
+
+  # Set the i18n messages.
+  $l_msg=setMessages($l_projectUrl, $l_pageName, $l_displayedPageName);
+
   # Set the html.
-  $l_info=str_replace('$1', "<a href='http://$l_projectUrl/wiki/$l_pageName'>$l_displayedPageName</a>", $l_msg['visualizer4mw-info']);
-  $l_info=str_replace('$2', $l_projectUrl, $l_info);
+  $l_htmlcode = '  <div id="info" class="noLinkDecoration">'.$l_msg['visualizer4mw-info'].'</div>
+  <div id="chart_div"></div>';
 
-  $l_htmlcode = <<<MYHMTLCODE
-  <div id="info" class="noLinkDecoration">$l_info</div>
-  <div id="chart_div"></div>
-MYHMTLCODE;
-
-  printHTML($l_jscode,$l_htmlcode,$l_msg['visualizer4mw'],$l_ltr);
+  printHTML($l_jscode,$l_htmlcode,$l_msg['visualizer4mw'],$l_msg['is_rtl']);
 }
 
 main();

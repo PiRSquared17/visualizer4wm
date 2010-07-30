@@ -92,26 +92,21 @@ function getWikiTableFromContent($p_content, $p_templateName)
   if (false==$l_tableContent)
   {
     $l_tableContent = strstr($p_content, "{{".lcfirst($p_templateName));
-  }
-  if (false==$l_tableContent)
-  {
-    return "error1";
+    if (false==$l_tableContent) { return "no template"; }
   }
 
   // Handle multiple tables per page
   $l_id=get('id',1);
   if (1!=$l_id) {
-    for ($i=1; $i<$l_id; $i++) {
-	$l_tableContent = substr($l_tableContent, 1);
-        $l_tableContent = strstr($l_tableContent, "{{".ucfirst($p_templateName));
-        if (false==$l_tableContent)
-        {
-          $l_tableContent = strstr($l_tableContent, "{{".lcfirst($p_templateName));
-        }
-       if (false==$l_tableContent)
-       {
-         return "error3";
-       }
+    for ($i=1; $i<$l_id; $i++)
+    {
+      $l_tableContent = substr($l_tableContent, 1);
+      $l_tableContent = strstr($l_tableContent, "{{".ucfirst($p_templateName));
+      if (false==$l_tableContent)
+      {
+        $l_tableContent = strstr($l_tableContent, "{{".lcfirst($p_templateName));
+        if (false==$l_tableContent) { return "not enough templates"; }
+      }
     }
   }
 
@@ -121,10 +116,7 @@ function getWikiTableFromContent($p_content, $p_templateName)
 
   // Remove everything after the wikitable.
   $l_endingContent = strstr( $l_tableContent, "\n|}");
-  if (false==$l_endingContent)
-  {
-      return "error2";
-  }
+  if (false==$l_endingContent) { return "no table ending"; }
   $l_tableContent=substr( $l_tableContent, 0, -strlen($l_endingContent) );
 
   // Clean the wikitable wikisyntax.
@@ -685,14 +677,19 @@ function main()
 
     # Try to get data from content or return an error.
     $l_dataLines = getWikiTableFromContent($l_pageContent,$l_templateName);
-    if ('error1'==$l_dataLines) {
-      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the string: <tt>{{".$l_templateName."</tt><br />Check the template parameter <tt>tpl=</tt>");
-    }
-    if ('error2'==$l_dataLines) {
-      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the line: <tt>|}</tt>");
-    }
-    if ('error3'==$l_dataLines) {
-      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not include the template ".$l_templateName." <b>as many times as requested</b>.<br />Check the template id parameter <tt>id=</tt>");
+    if (!is_array($l_dataLines))
+    {
+      switch ($l_dataLines) {
+	case 'no template':
+	  exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the string: <tt>{{".$l_templateName."</tt><br />Check the template parameter <tt>tpl=</tt>");
+	  break;
+        case 'no table ending':
+	  exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the line: <tt>|}</tt>");
+  	  break;
+	case 'not enough templates':
+	  exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not include the template ".$l_templateName." <b>as many times as requested</b>.<br />Check the template id parameter <tt>id=</tt>");
+	  break;
+      }
     }
 
     # Generate the chart js and html.   

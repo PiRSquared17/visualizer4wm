@@ -32,6 +32,7 @@ function get($p_name, $p_default=null)
  */
 function getContentFromMediaWiki ($p_pageName,$p_projectUrl)
 {
+  ini_set('user_agent', 'Al Maghi\'s visualizer4wm.php script');
   $l_sourceUrl     = sprintf('http://%s/w/api.php?action=query&prop=revisions&titles=%s&rvprop=content&format=xml',
 												  $p_projectUrl,
 												  $p_pageName);
@@ -39,13 +40,11 @@ function getContentFromMediaWiki ($p_pageName,$p_projectUrl)
   if (false==$l_rawPageSourceCode) {
     exit("Could not get <a href=\"$l_sourceUrl\">contents from MediaWiki api</a> on $p_projectUrl/w/api.php.");
   }
-
   $l_pageSourceCode = strstr($l_rawPageSourceCode, '<rev xml:space="preserve">');
   if (false==$l_pageSourceCode)
   {
     exit("Sorry, the page <tt>[[<a href=\"http://$p_projectUrl/wiki/$p_pageName\">$p_pageName</a>]]</tt> does not exist on $p_projectUrl. (You may want to <a href=\"http://$p_projectUrl/w/index.php?title=$p_pageName&amp;action=edit\">start the page <em>$p_pageName</em></a>.)");
   }
-
   $l_pageSourceCode = substr($l_pageSourceCode,
 					  strlen('<rev xml:space="preserve">'),
 					  -strlen('</rev></revisions></page></pages></query></api>') );
@@ -196,7 +195,7 @@ function removeRegexpMatch($p_regexp,$p_input)
  ** @details Return an array of the html and js to be printed.
  **
  */
-function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
+function generateChartFromTableLines($p_dataLines,$p_ct, $p_displayedPageName)
 {
   # Get the data.
   $l_data=getDataFromWikitableLines($p_dataLines);
@@ -310,6 +309,8 @@ function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
   }
   $l_rows = implode(";\n", $javascriptRows).";";
 
+  # Get the chart size and title.
+  $l_chartTitle = getChartTitle($p_displayedPageName);
   $l_height = get("height",'500');
   $l_width = get("width",'1000');
 
@@ -457,44 +458,45 @@ $p_javascriptRows
       }
     </script>
 MYJSCODE;
-	      return $l_jscode;
+  return $l_jscode;
 }
 
 
 /**
- ** @brief Clean the chart title
- ** @param $p_input The chart title from the url argument title.
- ** @details Return a clean title.
+ ** @brief Get the chart title
+ ** @param $p_default The default chart title.
+ ** @details Return the chart title.
  **
  */
-function cleanChartTitle($p_input)
+function getChartTitle($p_default)
 {
+  $l_chartTitle = get("title", $p_default);
+  if ( $l_chartTitle != $p_default)
+  {
+    // Remove any QINU error.
+    $l_regexp = "UNIQ(.*)QINU";
+    $l_chartTitle = removeRegexpMatch($l_regexp,$l_chartTitle);
 
-  // Remove any QINU error.
-  $l_regexp = "UNIQ(.*)QINU";
-  $p_input = removeRegexpMatch($l_regexp,$p_input);
-
-  // Manage its wikisyntax: remove links and formatting.
-  $l_remove = array ("[[","]]","'''","''", "<small>", "</small>");
-  foreach($l_remove as $s) {
-    $p_input=str_replace( $s,'',$p_input);
+    // Manage its wikisyntax: remove links and formatting.
+    $l_remove = array ("[[","]]","'''","''", "<small>", "</small>");
+    foreach($l_remove as $s) {
+      $l_chartTitle=str_replace( $s,'',$l_chartTitle);
+    }
+    // Manage its wikisyntax: replace <br> with space.
+    $l_remove = array ("<br />", "<br>");
+    foreach($l_remove as $s) {
+      $l_chartTitle=str_replace( $s," ",$l_chartTitle);
+    }
+    // Manage its simple quotes.
+    $l_chartTitle=str_replace("'","\'",$l_chartTitle);
   }
-
-  // Manage its wikisyntax: replace <br> with space.
-  $l_remove = array ("<br />", "<br>");
-  foreach($l_remove as $s) {
-    $p_input=str_replace( $s," ",$p_input);
-  }
-
-  // Manage its simple quotes.
-  $p_input=str_replace("'","\'",$p_input);
-
-  return $p_input;
+  return $l_chartTitle;
 }
+
 
 /**
  ** @brief Set the system messages
- ** @details Get language from url argument and return its messages
+ ** @details Get language and return its messages
  */
 function setMessages($p_projectUrl,$p_pageName,$p_displayedPageName)
 {
@@ -511,7 +513,6 @@ function setMessages($p_projectUrl,$p_pageName,$p_displayedPageName)
   $l_msg['is_rtl']=$l_rtlCode;
   $l_msg['visualizer4mw-info']=str_replace('$1', "<a href='http://$p_projectUrl/wiki/$p_pageName'>$p_displayedPageName</a>", $l_msg['visualizer4mw-info']);
   $l_msg['visualizer4mw-info']=str_replace('$2', $p_projectUrl, $l_msg['visualizer4mw-info']);
-
   return $l_msg;
 }
 
@@ -528,7 +529,6 @@ function setMessages($p_projectUrl,$p_pageName,$p_displayedPageName)
 function printHTML($p_javaScriptCode="",
                    $p_htmlCode="", $p_title="Wikitable Visualizer", $p_ltr="")
 {
-
   if (''==$p_htmlCode) {
     $p_htmlCode='<div id="index"><br />Welcome on the wikitable visualizer tool.<br /><br />
 		  See it in action with
@@ -588,8 +588,6 @@ MYHMTLPAGE;
  */
 function main()
 {
-  ini_set('user_agent', 'Al Maghi\'s visualizer4wm.php script');
-
   # Get the page name or print default html.
   $l_pageName   = str_replace(' ','_',get("page", "_"));
   if ("_"==$l_pageName || ""==$l_pageName) {
@@ -662,25 +660,16 @@ function main()
       }
     }
 
-    # Get the chart title.
-    $l_chartTitle = get("title", $l_displayedPageName);
-    if ( $l_chartTitle != $l_displayedPageName)
-    {
-      $l_chartTitle=cleanChartTitle($l_chartTitle);
-    }
-
     # Generate the js code.
-    $l_jscode=generateChartFromTableLines($l_dataLines, $l_chartType, $l_chartTitle);
+    $l_jscode=generateChartFromTableLines($l_dataLines, $l_chartType, $l_displayedPageName);
   }
-
 
   # Set the i18n messages.
   $l_msg=setMessages($l_projectUrl, $l_pageName, $l_displayedPageName);
 
-  # Set the html.
+  # Print HTML.
   $l_htmlcode = '  <div id="info" class="noLinkDecoration">'.$l_msg['visualizer4mw-info'].'</div>
   <div id="chart_div"></div>';
-
   printHTML($l_jscode,$l_htmlcode,$l_msg['visualizer4mw'],$l_msg['is_rtl']);
 }
 

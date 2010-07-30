@@ -97,16 +97,14 @@ function getWikiTableFromContent($p_content, $p_templateName)
 
   // Handle multiple tables per page
   $l_id=get('id',1);
-  if (1!=$l_id) {
-    for ($i=1; $i<$l_id; $i++)
+  for ($i=1; $i<$l_id; $i++)
+  {
+    $l_tableContent = substr($l_tableContent, 1);
+    $l_tableContent = strstr($l_tableContent, "{{".ucfirst($p_templateName));
+    if (false==$l_tableContent)
     {
-      $l_tableContent = substr($l_tableContent, 1);
-      $l_tableContent = strstr($l_tableContent, "{{".ucfirst($p_templateName));
-      if (false==$l_tableContent)
-      {
-        $l_tableContent = strstr($l_tableContent, "{{".lcfirst($p_templateName));
-        if (false==$l_tableContent) { return "not enough templates"; }
-      }
+      $l_tableContent = strstr($l_tableContent, "{{".lcfirst($p_templateName));
+      if (false==$l_tableContent) { return "not enough templates"; }
     }
   }
 
@@ -384,10 +382,7 @@ function generateChartFromTableLines($p_dataLines,$p_ct, $p_chartTitle)
     </script>
 MYJSCODE;
 
-  # Set the html.
-  $l_htmlChart = '<div id="chart_div"></div>';
-
-  return array($l_jsChart, $l_htmlChart);
+  return $l_jsChart;
 }
 
 /**
@@ -477,27 +472,16 @@ function motionChart_generateJsFromContent($p_content)
 
 
 /**
- ** @brief motionChart only - Set the js and the html to be printed
- ** @param $p_pageName,
- ** @param $p_displayedPageName,
- ** @param $p_projectUrl,
+ ** @brief motionChart only - Set the js to be printed
  ** @param $p_javaScriptRows,
  ** @param $p_groupName,
  ** @param $p_xAxisCaption,
  ** @param $p_yAxisCaption
- ** @details For motion chart: return an array of the js and html to be printed.
+ ** @details For motion chart: return the js to be printed.
  **
  */
-function motionChart_setJsAndHtml($p_pageName, $p_displayedPageName, $p_projectUrl, $p_javascriptRows, $p_groupName, $p_xAxisCaption, $p_yAxisCaption)
+function motionChart_setJs($p_javascriptRows, $p_groupName, $p_xAxisCaption, $p_yAxisCaption)
 {
-  $l_htmlcode = <<<MYHMTLCODE
-    <div id="info" class="noLinkDecoration">
-      Data source is
-      <a href="http://$p_projectUrl/wiki/$p_pageName">$p_displayedPageName</a> on $p_projectUrl.
-    </div>
-    <div id="chart_div"></div>
-MYHMTLCODE;
-
   $l_jscode = <<<MYJSCODE
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
 
@@ -522,7 +506,7 @@ $p_javascriptRows
       }
     </script>
 MYJSCODE;
-	      return array('html'=>$l_htmlcode,'js'=>$l_jscode);
+	      return $l_jscode;
 }
 
 
@@ -621,18 +605,13 @@ function main()
 					  'wikiversity.org'),
 
     'chart types'		=>	array('pie','bar', 'col', 'line', 'scatter', 'area', 'geomap', 'intensitymap', 'sparkline'),
-
-    'RTL-languages'		=>	array('ar','he', 'fa'),
   );
 
-  # Get the language.
+  # Get the language and its direction.
   $lang=get("lang", "en");
   $l_msg=setMessages($lang);
-  $l_title= $l_msg['visualizer4mw'];
-  if ('yes'==$l_msg['is_rtl'])
-  {
-    $l_ltr=".rtl";
-  }
+  $l_ltr="";
+  if ('yes'==$l_msg['is_rtl']) { $l_ltr=".rtl"; }
 
   # Get the project url and check its domain name.
   $l_projectUrl = get("project", "en.wikipedia.org");
@@ -647,7 +626,7 @@ function main()
   # Get the template name.
   $l_templateName = get("tpl", "visualizer");
 
-  # Generate the chart and print it.
+  # Generate the js for motion chart.
   if ("motionchart"==$l_templateName)
   {
     $l_javascriptRows = motionChart_generateJsFromContent($l_pageContent);
@@ -657,9 +636,9 @@ function main()
     $l_xAxisCaption  = get("x",     "x axis");
     $l_yAxisCaption  = get("y",     "y axis");
     $l_groupName     = get("group", "Labels");
-    $l_jsHtml = motionChart_setJsAndHtml($l_pageName, $l_displayedPageName, $l_projectUrl, $l_javascriptRows, $l_groupName, $l_xAxisCaption, $l_yAxisCaption);
-    printHTML($l_jsHtml['js'], $l_jsHtml['html']);
+    $l_jscode = motionChart_setJs($l_javascriptRows, $l_groupName, $l_xAxisCaption, $l_yAxisCaption);
   }
+  # Generate the js for other charts.
   else
   {
     # Get the chart type and check it.
@@ -692,22 +671,19 @@ function main()
       }
     }
 
-    # Generate the chart js and html.   
-    $l_Chart=generateChartFromTableLines($l_dataLines, $l_chartType, $l_chartTitle);
+    $l_jscode=generateChartFromTableLines($l_dataLines, $l_chartType, $l_chartTitle);
+  }
 
-    $l_htmlChart=$l_Chart[1];
-    $l_jscode=$l_Chart[0];
+  # Set the html.
+  $l_info=str_replace('$1', "<a href='http://$l_projectUrl/wiki/$l_pageName'>$l_displayedPageName</a>", $l_msg['visualizer4mw-info']);
+  $l_info=str_replace('$2', $l_projectUrl, $l_info);
 
-    $l_info=str_replace('$1', "<a href='http://$l_projectUrl/wiki/$l_pageName'>$l_displayedPageName</a>", $l_msg['visualizer4mw-info']);
-    $l_info=str_replace('$2', $l_projectUrl, $l_info);
-
-    $l_htmlcode = <<<MYHMTLCODE
-    <div id="info" class="noLinkDecoration">$l_info</div>
-    $l_htmlChart
+  $l_htmlcode = <<<MYHMTLCODE
+  <div id="info" class="noLinkDecoration">$l_info</div>
+  <div id="chart_div"></div>
 MYHMTLCODE;
 
-    printHTML($l_jscode,$l_htmlcode,$l_title,$l_ltr);
-  }
+  printHTML($l_jscode,$l_htmlcode,$l_msg['visualizer4mw'],$l_ltr);
 }
 
 main();

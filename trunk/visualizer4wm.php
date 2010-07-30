@@ -24,30 +24,6 @@ function get($p_name, $p_default=null)
 
 
 /**
- ** @brief Set the system messages
- ** @details Get language from url argument and return its messages
- */
-function setMessages($p_projectUrl,$p_pageName,$p_displayedPageName)
-{
-  require_once("./visualizer4wm.i18n.php");
-  $lang=get("lang", "en");
-  $l_rtlCode="";
-
-  if(isset($messages[$lang])) {
-    $l_msg = $messages[$lang];
-    if ('yes'==$l_msg['is_rtl']) { $l_rtlCode=".rtl"; }
-  } else {
-    $l_msg = $messages['en'];
-  }
-  $l_msg['is_rtl']=$l_rtlCode;
-  $l_msg['visualizer4mw-info']=str_replace('$1', "<a href='http://$p_projectUrl/wiki/$p_pageName'>$p_displayedPageName</a>", $l_msg['visualizer4mw-info']);
-  $l_msg['visualizer4mw-info']=str_replace('$2', $p_projectUrl, $l_msg['visualizer4mw-info']);
-
-  return $l_msg;
-}
-
-
-/**
  ** @brief Get the page content with MediaWiki API
  ** @param $p_pageName The page name
  ** @param $p_projectUrl The project url, eg. en.wikipedia.org
@@ -132,7 +108,6 @@ function getWikiTableFromContent($p_content, $p_templateName)
   // Return the wikitable lines.
   $l_lines = explode("|-", $l_tableContent);
   return $l_lines;
-
 }
 
 
@@ -185,9 +160,9 @@ function cleanWikitableContent($p_input)
   }
 
   $p_input=str_replace("'","\'",$p_input);
-
   return $p_input;
 }
+
 
 /**
  ** @brief Remove regexp matches
@@ -206,42 +181,9 @@ function removeRegexpMatch($p_regexp,$p_input)
       }
     }
   }
-
   foreach($l_remove as $s) {
     $p_input=str_replace( $s,'',$p_input);
   }
-
-  return $p_input;
-}
-
-/**
- ** @brief Clean the chart title
- ** @param $p_input The chart title from the url argument title.
- ** @details Return a clean title.
- **
- */
-function cleanChartTitle($p_input)
-{
-
-  // Remove any QINU error.
-  $l_regexp = "UNIQ(.*)QINU";
-  $p_input = removeRegexpMatch($l_regexp,$p_input);
-
-  // Manage its wikisyntax: remove links and formatting.
-  $l_remove = array ("[[","]]","'''","''", "<small>", "</small>");
-  foreach($l_remove as $s) {
-    $p_input=str_replace( $s,'',$p_input);
-  }
-
-  // Manage its wikisyntax: replace <br> with space.
-  $l_remove = array ("<br />", "<br>");
-  foreach($l_remove as $s) {
-    $p_input=str_replace( $s," ",$p_input);
-  }
-
-  // Manage its simple quotes.
-  $p_input=str_replace("'","\'",$p_input);
-
   return $p_input;
 }
 
@@ -516,6 +458,61 @@ $p_javascriptRows
     </script>
 MYJSCODE;
 	      return $l_jscode;
+}
+
+
+/**
+ ** @brief Clean the chart title
+ ** @param $p_input The chart title from the url argument title.
+ ** @details Return a clean title.
+ **
+ */
+function cleanChartTitle($p_input)
+{
+
+  // Remove any QINU error.
+  $l_regexp = "UNIQ(.*)QINU";
+  $p_input = removeRegexpMatch($l_regexp,$p_input);
+
+  // Manage its wikisyntax: remove links and formatting.
+  $l_remove = array ("[[","]]","'''","''", "<small>", "</small>");
+  foreach($l_remove as $s) {
+    $p_input=str_replace( $s,'',$p_input);
+  }
+
+  // Manage its wikisyntax: replace <br> with space.
+  $l_remove = array ("<br />", "<br>");
+  foreach($l_remove as $s) {
+    $p_input=str_replace( $s," ",$p_input);
+  }
+
+  // Manage its simple quotes.
+  $p_input=str_replace("'","\'",$p_input);
+
+  return $p_input;
+}
+
+/**
+ ** @brief Set the system messages
+ ** @details Get language from url argument and return its messages
+ */
+function setMessages($p_projectUrl,$p_pageName,$p_displayedPageName)
+{
+  require_once("./visualizer4wm.i18n.php");
+  $lang=get("lang", "en");
+  $l_rtlCode="";
+
+  if(isset($messages[$lang])) {
+    $l_msg = $messages[$lang];
+    if ('yes'==$l_msg['is_rtl']) { $l_rtlCode=".rtl"; }
+  } else {
+    $l_msg = $messages['en'];
+  }
+  $l_msg['is_rtl']=$l_rtlCode;
+  $l_msg['visualizer4mw-info']=str_replace('$1', "<a href='http://$p_projectUrl/wiki/$p_pageName'>$p_displayedPageName</a>", $l_msg['visualizer4mw-info']);
+  $l_msg['visualizer4mw-info']=str_replace('$2', $p_projectUrl, $l_msg['visualizer4mw-info']);
+
+  return $l_msg;
 }
 
 

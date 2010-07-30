@@ -1,7 +1,7 @@
 <?php
-/** @file csv2templateVisualize.php
+/** @file csv2templateMotionchart.php
  ** @brief Generate mediawiki formated data.
- ** @details Generate mediawiki formated data using {{Visualize}} and {{dataset}}.
+ ** @details Generate mediawiki formated data using {{Motionchart}} and {{dataset}}.
  ** Authors include [[w:fr:User:Al Maghi]] and Xavier Marcelet.
  **/
 
@@ -17,7 +17,7 @@ function printHTML($p_PrintedContent)
   if ("" == $p_PrintedContent) 
   {
     $p_PrintedContent = '
-    <h3>csv2templateVisualize - Convert a csv file to formated data for {{<a href="http://en.wikipedia.org/wiki/Template:Visualize">Visualize</a>}}</h3>
+    <h3>csv2templateMotionchart - Convert a csv file to formated data for {{<a href="http://en.wikipedia.org/wiki/Template:Motionchart">Motionchart</a>}}</h3>
 
     <div id="main">
       <p>Your table should have 4 or 5 columns: <tt>id</tt>, <tt>date</tt>, <tt>x</tt>, <tt>y,</tt> <tt>group</tt>. An example csv content would be:</p>
@@ -31,7 +31,7 @@ function printHTML($p_PrintedContent)
       <span class="info">The fifth column (<tt>group</tt>) is optional. If none, group value will be equal to id.</span>
       <span class="info">Semicolons can replace commas. Double quotes will be removed.</span>
 
-      <form method="post" enctype="multipart/form-data" action="csv2templateVisualize.php">
+      <form method="post" enctype="multipart/form-data" action="csv2templateMotionchart.php">
 	<p>
 	<input type="file" name="csvFile" size="40" />
 	<input type="submit" name="uploadcsv" value="Send csv file" />
@@ -47,7 +47,7 @@ function printHTML($p_PrintedContent)
 		december 2003, 921015,51621,54113,etc.
 	</div>
 
-	<form method="post" enctype="multipart/form-data" action="csv2templateVisualize.php">
+	<form method="post" enctype="multipart/form-data" action="csv2templateMotionchart.php">
 	    <p>
 	    <span class="info">X axis data file: <input type="file" name="csvXFile" size="55" /></span>
 	    <span class="info">Y axis data file: <input type="file" name="csvYFile" size="55" /><input type="submit" name="upload2csv" value="Send two csv files" /></span>
@@ -71,7 +71,7 @@ function printHTML($p_PrintedContent)
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
-    <title>cvs2visualize - Generate wikidata Visualizer</title>
+    <title>cvs2templateMotionchart - Generate wikidata Motionchart</title>
     <link rel="stylesheet" href="./generators.css" type="text/css" media="screen" />
   </head>
 
@@ -128,7 +128,7 @@ function manageUploadedFile($p_file)
  */
 function wikifyCsv($p_cvsContent)
 {
-	$l_wikiString = "{{Visualize
+	$l_wikiString = "{{Motionchart
 	   | x = X axis caption
 	   | y = Y axis caption
 	   | group = Groups caption |\n";
@@ -272,7 +272,7 @@ function combineCsv($p_Xfile,$p_Yfile)
 	}
 
 	// Start $l_wikiString...
-	$l_wikiString .= "{{Visualize
+	$l_wikiString .= "{{Motionchart
 	   | x = ".substr($p_Xfile['title'], 0, -4)."
 	   | y = ".substr($p_Yfile['title'], 0, -4)."
 	   | group = Groups caption |";

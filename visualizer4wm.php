@@ -588,8 +588,9 @@ function printHTML($p_javaScriptCode="",
     <div id="mw_header"><a href="./visualizer4wm.php">$p_title</a><br /><span>Wikimedia toolserver</span></div>
     <div id="main">$p_htmlCode</div>
     <div id="documentation">
-    	<tt>{{<a href="./index.html">Visualizer</a>}}</tt> &nbsp;
-      &#8734; &nbsp; The data visualizer tool is kindly served to you by the <span class="hidden"><a href="http://toolserver.org/">Wikimedia Toolserver</a>.
+    	<span class="hidden"><tt>{{<a href="./index.html">Visualizer</a>}}</tt> &nbsp;
+      &#8734; &nbsp; <a href="http://meta.wikimedia.org/wiki/visualizer4wm">documentation</a> &nbsp;
+      &#8734; &nbsp; The visualizer tool is kindly served to you by the <a href="http://toolserver.org/">Wikimedia Toolserver</a>.
       	It uses the <a href="http://mediawiki.org/wiki/API">MediaWiki</a>
       	and the <a href="http://code.google.com/intl/en-EN/apis/visualization/interactive_charts.html">Vizualisation</a></span> APIs.
     </div>

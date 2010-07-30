@@ -92,7 +92,7 @@ $messages['nl'] = array(
  * @author Herr Kriss
  */
 $messages['pl'] = array(
-	'visualizer4mw' => 'Narzędzie do wizualizacji wikitabel',
+	'visualizer4mw' =>  'Wykresy na podstawie danych pobranych z wiki',
 	'visualizer4mw-info' => 'Źródło danych to $1 na $2.'
 );
 

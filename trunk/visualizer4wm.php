@@ -591,7 +591,7 @@ function printHTML($p_javaScriptCode="",
     	<tt>{{<a href="./index.html">Visualizer</a>}}</tt> &nbsp;
       &#8734; &nbsp; The data visualizer tool is kindly served to you by the <span class="hidden"><a href="http://toolserver.org/">Wikimedia Toolserver</a>.
       	It uses the <a href="http://mediawiki.org/wiki/API">MediaWiki</a>
-      	and the <a href="http://code.google.com/intl/fr-FR/apis/visualization/interactive_charts.html">Vizualisation</a></span> APIs.
+      	and the <a href="http://code.google.com/intl/en-EN/apis/visualization/interactive_charts.html">Vizualisation</a></span> APIs.
     </div>
   </body>
 </html>

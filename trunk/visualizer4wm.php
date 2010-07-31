@@ -57,14 +57,15 @@ function getContentFromMediaWiki ($p_projectUrl,$p_pageName)
  ** @param $p_pageContent The raw content of the page
  ** @param $p_projectUrl The project url, eg. en.wikipedia.org
  ** @param $p_pageName The page name
- ** @param $p_displayedPageName The displayed page name
  ** @details Get the template name, parse source and generate JavaScript.
  */
-function run_visualizer($p_pageContent, $p_projectUrl, $l_pageName, $p_displayedPageName)
+function run_visualizer($p_pageContent, $p_projectUrl, $l_pageName)
 {
   # Get the template name or exit.
   $l_templateName = get("tpl", "_");
   if ("_"==$l_templateName || ""==$l_templateName) { exit("Add the visualizer template name to your http request: <tt>&tpl=templateName</tt>"); }
+
+  $l_displayedPageName = str_replace('_',' ',$p_pageName);
 
   # Run...
   if ("motionchart"==$l_templateName)
@@ -72,7 +73,7 @@ function run_visualizer($p_pageContent, $p_projectUrl, $l_pageName, $p_displayed
     # Generate the js code for motion chart.
     $l_javascriptRows = motionChart_generateJsFromContent($p_pageContent);
     if (null==$l_javascriptRows) {
-      exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$p_displayedPageName</a> is not using correctly {{dataset}} and {{visualize}}.<br />Check the template parameter <tt>tpl=$l_templateName</tt>");
+      exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$l_displayedPageName</a> is not using correctly {{dataset}} and {{visualize}}.<br />Check the template parameter <tt>tpl=$l_templateName</tt>");
     }
     $l_xAxisCaption  = get("x",     "x axis");
     $l_yAxisCaption  = get("y",     "y axis");
@@ -93,18 +94,18 @@ function run_visualizer($p_pageContent, $p_projectUrl, $l_pageName, $p_displayed
     {
       switch ($l_dataLines) {
 	case 'no template':
-	  exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$p_displayedPageName</a> does not contain the string: <tt>{{".$l_templateName."</tt><br />Check the template parameter <tt>tpl=</tt>");
+	  exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$l_displayedPageName</a> does not contain the string: <tt>{{".$l_templateName."</tt><br />Check the template parameter <tt>tpl=</tt>");
 	  break;
 	case 'no table ending':
-	  exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$p_displayedPageName</a> does not contain the line: <tt>|}</tt>");
+	  exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$l_displayedPageName</a> does not contain the line: <tt>|}</tt>");
 	  break;
 	case 'not enough templates':
-	  exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$p_displayedPageName</a> does not include the template ".$l_templateName." <b>as many times as requested</b>.<br />Check the template id parameter <tt>id=</tt>");
+	  exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$l_displayedPageName</a> does not include the template ".$l_templateName." <b>as many times as requested</b>.<br />Check the template id parameter <tt>id=</tt>");
 	  break;
       }
     }
     # Generate the js code.
-    $l_jscode = generateChartFromTableLines($l_dataLines, $l_chartType, $p_displayedPageName);
+    $l_jscode = generateChartFromTableLines($l_dataLines, $l_chartType, $l_displayedPageName);
   }
 
   # Return the js code.
@@ -558,10 +559,9 @@ function getChartTitle($p_default)
  ** @brief Set the system messages
  ** @param $p_projectUrl The project url, eg. en.wikipedia.org
  ** @param $p_pageName The page name
- ** @param $p_displayedPageName The displayed page name
  ** @details Get language and return its messages
  */
-function setMessages($p_projectUrl,$p_pageName,$p_displayedPageName)
+function setMessages($p_projectUrl,$p_pageName)
 {
   require_once("./visualizer4wm.i18n.php");
   $lang=get("lang", "en");
@@ -574,7 +574,8 @@ function setMessages($p_projectUrl,$p_pageName,$p_displayedPageName)
     $l_msg = $messages['en'];
   }
   $l_msg['is_rtl']=$l_rtlCode;
-  $l_msg['visualizer4mw-info'] = str_replace('$1', "<a href='http://$p_projectUrl/wiki/$p_pageName'>$p_displayedPageName</a>", $l_msg['visualizer4mw-info']);
+  $l_displayedPageName = str_replace('_',' ',$p_pageName);
+  $l_msg['visualizer4mw-info'] = str_replace('$1', "<a href='http://$p_projectUrl/wiki/$p_pageName'>$l_displayedPageName</a>", $l_msg['visualizer4mw-info']);
   $l_msg['visualizer4mw-info'] = str_replace('$2', $p_projectUrl, $l_msg['visualizer4mw-info']);
   $l_msg['visualizer4mw-info'] = '<div id="info" class="noLinkDecoration">'.$l_msg['visualizer4mw-info'].'</div>
       <div id="chart_div"></div>';
@@ -659,7 +660,7 @@ function main()
     exit(printHTML());
   }
 
-  # Set the authorised domains.
+  # Set the authorised domain names.
   $l_domains = array('wikipedia.org',
 		    'wikimedia.org',
 		    'wikibooks.org',
@@ -670,7 +671,7 @@ function main()
 		    'wikisource.org',
 		    'wikiversity.org');
 
-  # Get the project url and check its domain name.
+  # Get and check the project url.
   $l_projectUrl = get("project", "en.wikipedia.org");
   $l_projectDomain = substr(strstr($l_projectUrl, '.'),1);
   if ( !in_array( $l_projectDomain, $l_domains)) {
@@ -681,11 +682,10 @@ function main()
   $l_pageContent = getContentFromMediaWiki($l_projectUrl, $l_pageName);
 
   # Run the visualizer.
-  $l_displayedPageName = str_replace('_',' ',$l_pageName);
-  $l_jscode=run_visualizer($l_pageContent, $l_projectUrl, $l_pageName, $l_displayedPageName);
+  $l_jscode = run_visualizer($l_pageContent, $l_projectUrl, $l_pageName);
 
   # Set the i18n messages.
-  $l_msg=setMessages($l_projectUrl, $l_pageName, $l_displayedPageName);
+  $l_msg = setMessages($l_projectUrl, $l_pageName);
 
   # Print HTML.
   printHTML($l_jscode,$l_msg['visualizer4mw-info'],$l_msg['visualizer4mw'],$l_msg['is_rtl']);

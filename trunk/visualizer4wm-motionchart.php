@@ -1,9 +1,7 @@
 <?php
 /** @file visualizer4wm-motionchart.php
- ** @brief Visualize data published on a wikimedia project
- ** @details Visualize data using MediaWiki and charting APIs.
- ** It offers visualization of data published on a wikipage.
- ** Authors include [[w:fr:User:Al Maghi]] and Xavier Marcelet.
+ ** @brief Motionchart generator
+ ** @details Generate the javascript to visualize a {{motionchart}}.
  **/
 
 
@@ -22,7 +20,6 @@ function MotionchartGenerator($p_pageContent, $p_projectUrl, $p_pageName)
   $l_jscode = motionChart_setJs($l_javascriptRows);
   return $l_jscode;
 }
-
 
 
 /**

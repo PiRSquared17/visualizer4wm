@@ -61,11 +61,14 @@ function getContentFromMediaWiki ($p_projectUrl,$p_pageName)
  */
 function run_visualizer($p_pageContent, $p_projectUrl, $l_pageName)
 {
+  $l_displayedPageName = str_replace('_',' ',$p_pageName);
+
   # Get the template name or exit.
   $l_templateName = get("tpl", "_");
   if ("_"==$l_templateName || ""==$l_templateName) { exit("Add the visualizer template name to your http request: <tt>&tpl=templateName</tt>"); }
 
-  $l_displayedPageName = str_replace('_',' ',$p_pageName);
+  # Try to get content from MediaWiki or exit.
+  $l_pageContent = getContentFromMediaWiki($p_projectUrl, $p_pageName);
 
   # Run...
   if ("motionchart"==$l_templateName)
@@ -660,7 +663,9 @@ function main()
     exit(printHTML());
   }
 
-  # Set the authorised domain names.
+  # Get the project url and check its domain name.
+  $l_projectUrl = get("project", "en.wikipedia.org");
+  $l_projectDomain = substr(strstr($l_projectUrl, '.'),1);
   $l_domains = array('wikipedia.org',
 		    'wikimedia.org',
 		    'wikibooks.org',
@@ -670,16 +675,9 @@ function main()
 		    'wiktionary.org',
 		    'wikisource.org',
 		    'wikiversity.org');
-
-  # Get and check the project url.
-  $l_projectUrl = get("project", "en.wikipedia.org");
-  $l_projectDomain = substr(strstr($l_projectUrl, '.'),1);
   if ( !in_array( $l_projectDomain, $l_domains)) {
     exit("Sorry but <a href=\"http://$l_projectDomain\">$l_projectDomain</a> is not an authorised domain name. (Contact us if you want to authorise a new domain name.)<br />The <tt>project</tt> parameter should be something such as en.wikipedia.org.");
   }
-
-  # Try to get content from MediaWiki or exit.
-  $l_pageContent = getContentFromMediaWiki($l_projectUrl, $l_pageName);
 
   # Run the visualizer.
   $l_jscode = run_visualizer($l_pageContent, $l_projectUrl, $l_pageName);

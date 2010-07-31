@@ -25,12 +25,12 @@ function get($p_name, $p_default=null)
 
 /**
  ** @brief Get the page content with MediaWiki API
- ** @param $p_pageName The page name
  ** @param $p_projectUrl The project url, eg. en.wikipedia.org
+ ** @param $p_pageName The page name
  ** @details Return the raw content of the page.
  **
  */
-function getContentFromMediaWiki ($p_pageName,$p_projectUrl)
+function getContentFromMediaWiki ($p_projectUrl,$p_pageName)
 {
   ini_set('user_agent', 'Al Maghi\'s visualizer4wm.php script');
   $l_sourceUrl     = sprintf('http://%s/w/api.php?action=query&prop=revisions&titles=%s&rvprop=content&format=xml',
@@ -191,7 +191,7 @@ function removeRegexpMatch($p_regexp,$p_input)
  ** @brief Generate the chart from the table lines
  ** @param $p_dataLines Array of lines from the wikitable,
  ** @param $p_ct the chart type,
- ** @param $p_chartTitle the chart title for UI,
+ ** @param $p_displayedPageName The displayed page name
  ** @details Return an array of the html and js to be printed.
  **
  */
@@ -328,7 +328,7 @@ function generateChartFromTableLines($p_dataLines,$p_ct, $p_displayedPageName)
 
         var chart = new google.visualization.$ChartType(document.getElementById('chart_div'));
         chart.draw(data, {width: $l_width, height:$l_height,
-			  title: '$p_chartTitle'$l_chartAxis
+			  title: '$l_chartTitle'$l_chartAxis
 			  });
       }
     </script>
@@ -496,6 +496,9 @@ function getChartTitle($p_default)
 
 /**
  ** @brief Set the system messages
+ ** @param $p_projectUrl The project url, eg. en.wikipedia.org
+ ** @param $p_pageName The page name
+ ** @param $p_displayedPageName The displayed page name
  ** @details Get language and return its messages
  */
 function setMessages($p_projectUrl,$p_pageName,$p_displayedPageName)
@@ -511,8 +514,10 @@ function setMessages($p_projectUrl,$p_pageName,$p_displayedPageName)
     $l_msg = $messages['en'];
   }
   $l_msg['is_rtl']=$l_rtlCode;
-  $l_msg['visualizer4mw-info']=str_replace('$1', "<a href='http://$p_projectUrl/wiki/$p_pageName'>$p_displayedPageName</a>", $l_msg['visualizer4mw-info']);
-  $l_msg['visualizer4mw-info']=str_replace('$2', $p_projectUrl, $l_msg['visualizer4mw-info']);
+  $l_msg['visualizer4mw-info'] = str_replace('$1', "<a href='http://$p_projectUrl/wiki/$p_pageName'>$p_displayedPageName</a>", $l_msg['visualizer4mw-info']);
+  $l_msg['visualizer4mw-info'] = str_replace('$2', $p_projectUrl, $l_msg['visualizer4mw-info']);
+  $l_msg['visualizer4mw-info'] = '<div id="info" class="noLinkDecoration">'.$l_msg['visualizer4mw-info'].'</div>
+      <div id="chart_div"></div>';
   return $l_msg;
 }
 
@@ -583,51 +588,28 @@ MYHMTLPAGE;
 
 
 /**
- ** @brief The main function
- ** @details Set user_agent, fetch url args, check parameters, get source, get data from source, generate JavaScript and html, print valid xhtml.
+ ** @brief Run the visualizer
+ ** @param $p_pageContent The raw content of the page
+ ** @param $p_projectUrl The project url, eg. en.wikipedia.org
+ ** @param $p_pageName The page name
+ ** @param $p_displayedPageName The displayed page name
+ ** @details Get the template name, parse source and generate JavaScript.
  */
-function main()
+function run_visualizer($p_pageContent, $p_projectUrl, $l_pageName, $p_displayedPageName)
 {
-  # Get the page name or print default html.
-  $l_pageName   = str_replace(' ','_',get("page", "_"));
-  if ("_"==$l_pageName || ""==$l_pageName) {
-    exit(printHTML());
+  # Get the template name or exit.
+  $l_templateName = get("tpl", "_");
+  if ("_"==$l_templateName || ""==$l_templateName)
+  {
+    exit("Add the visualizer template name to your http request: <tt>&tpl=templateName</tt>");
   }
-  $l_displayedPageName = str_replace('_',' ',$l_pageName);
-
-  # Set the authorised values for parameters.
-  $l_parameters = array(
-    'domains'		=>	array('wikipedia.org',
-					  'wikimedia.org',
-					  'wikibooks.org',
-					  'wikiquote.org',
-					  'mediawiki.org',
-					  'wikinews.org',
-					  'wiktionary.org',
-					  'wikisource.org',
-					  'wikiversity.org'),
-    'chart types'	=>	array('pie','bar', 'col', 'line', 'scatter', 'area', 'geomap', 'intensitymap', 'sparkline'),
-  );
-
-  # Get the project url and check its domain name.
-  $l_projectUrl = get("project", "en.wikipedia.org");
-  $l_projectDomain = substr(strstr($l_projectUrl, '.'),1);
-  if ( !in_array( $l_projectDomain, $l_parameters['domains'])) {
-    exit("Sorry but <a href=\"http://$l_projectDomain\">$l_projectDomain</a> is not an authorised domain name. (Contact us if you want to authorise a new domain name.)<br />The <tt>project</tt> parameter should be something such as en.wikipedia.org.");
-  }
-
-  # Try to get content from MediaWiki or exit.
-  $l_pageContent = getContentFromMediaWiki($l_pageName,$l_projectUrl);
-
-  # Get the template name.
-  $l_templateName = get("tpl", "visualizer");
 
   if ("motionchart"==$l_templateName)
   {
     # Generate the js code for motion chart.
-    $l_javascriptRows = motionChart_generateJsFromContent($l_pageContent);
+    $l_javascriptRows = motionChart_generateJsFromContent($p_pageContent);
     if (null==$l_javascriptRows) {
-      exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> is not using correctly {{dataset}} and {{visualize}}.<br />Check the template parameter <tt>tpl=$l_templateName</tt>");
+      exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$p_displayedPageName</a> is not using correctly {{dataset}} and {{visualize}}.<br />Check the template parameter <tt>tpl=$l_templateName</tt>");
     }
     $l_xAxisCaption  = get("x",     "x axis");
     $l_yAxisCaption  = get("y",     "y axis");
@@ -638,38 +620,76 @@ function main()
   {
     # Get the chart type and check it.
     $l_chartType  = get("ct", "pie");
-    if ( !in_array( $l_chartType, $l_parameters['chart types'])) {
+    $l_chartTypes = array('pie','bar', 'col', 'line', 'scatter', 'area', 'geomap', 'intensitymap', 'sparkline');
+    if ( !in_array( $l_chartType, $l_chartTypes)) {
       exit("Sorry but the chart type \"$l_chartType\" is not valid.");
     }
-
     # Try to get data from content or exit.
-    $l_dataLines = getWikiTableFromContent($l_pageContent,$l_templateName);
+    $l_dataLines = getWikiTableFromContent($p_pageContent,$l_templateName);
     if (!is_array($l_dataLines))
     {
       switch ($l_dataLines) {
 	case 'no template':
-	  exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the string: <tt>{{".$l_templateName."</tt><br />Check the template parameter <tt>tpl=</tt>");
+	  exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$p_displayedPageName</a> does not contain the string: <tt>{{".$l_templateName."</tt><br />Check the template parameter <tt>tpl=</tt>");
 	  break;
-        case 'no table ending':
-	  exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not contain the line: <tt>|}</tt>");
-  	  break;
+	case 'no table ending':
+	  exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$p_displayedPageName</a> does not contain the line: <tt>|}</tt>");
+	  break;
 	case 'not enough templates':
-	  exit("Sorry, the page <a href=\"http://$l_projectUrl/wiki/$l_pageName\">$l_displayedPageName</a> does not include the template ".$l_templateName." <b>as many times as requested</b>.<br />Check the template id parameter <tt>id=</tt>");
+	  exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$p_displayedPageName</a> does not include the template ".$l_templateName." <b>as many times as requested</b>.<br />Check the template id parameter <tt>id=</tt>");
 	  break;
       }
     }
-
     # Generate the js code.
-    $l_jscode=generateChartFromTableLines($l_dataLines, $l_chartType, $l_displayedPageName);
+    $l_jscode = generateChartFromTableLines($l_dataLines, $l_chartType, $p_displayedPageName);
   }
+
+  # Return the js code.
+  return $l_jscode;
+}
+
+/**
+ ** @brief The main function
+ ** @details Print default html or query MediaWiki API, run visualizer, set messages and print valid xhtml.
+ */
+function main()
+{
+  # Get the page name or print default html.
+  $l_pageName   = str_replace(' ','_',get("page", "_"));
+  if ("_"==$l_pageName || ""==$l_pageName) {
+    exit(printHTML());
+  }
+
+  # Set the authorised domains.
+  $l_domains = array('wikipedia.org',
+		    'wikimedia.org',
+		    'wikibooks.org',
+		    'wikiquote.org',
+		    'mediawiki.org',
+		    'wikinews.org',
+		    'wiktionary.org',
+		    'wikisource.org',
+		    'wikiversity.org');
+
+  # Get the project url and check its domain name.
+  $l_projectUrl = get("project", "en.wikipedia.org");
+  $l_projectDomain = substr(strstr($l_projectUrl, '.'),1);
+  if ( !in_array( $l_projectDomain, $l_domains)) {
+    exit("Sorry but <a href=\"http://$l_projectDomain\">$l_projectDomain</a> is not an authorised domain name. (Contact us if you want to authorise a new domain name.)<br />The <tt>project</tt> parameter should be something such as en.wikipedia.org.");
+  }
+
+  # Try to get content from MediaWiki or exit.
+  $l_pageContent = getContentFromMediaWiki($l_projectUrl, $l_pageName);
+
+  # Run the visualizer.
+  $l_displayedPageName = str_replace('_',' ',$l_pageName);
+  $l_jscode=run_visualizer($l_pageContent, $l_projectUrl, $l_pageName, $l_displayedPageName);
 
   # Set the i18n messages.
   $l_msg=setMessages($l_projectUrl, $l_pageName, $l_displayedPageName);
 
   # Print HTML.
-  $l_htmlcode = '  <div id="info" class="noLinkDecoration">'.$l_msg['visualizer4mw-info'].'</div>
-  <div id="chart_div"></div>';
-  printHTML($l_jscode,$l_htmlcode,$l_msg['visualizer4mw'],$l_msg['is_rtl']);
+  printHTML($l_jscode,$l_msg['visualizer4mw-info'],$l_msg['visualizer4mw'],$l_msg['is_rtl']);
 }
 
 main();

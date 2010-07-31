@@ -57,7 +57,7 @@ function getContentFromMediaWiki ($p_projectUrl,$p_pageName)
  ** @param $p_pageContent The raw content of the page
  ** @param $p_projectUrl The project url, eg. en.wikipedia.org
  ** @param $p_pageName The page name
- ** @details Get the template name, parse source and generate JavaScript.
+ ** @details Get the template name, query MediaWiki API, parse source and generate JavaScript.
  */
 function run_visualizer($p_pageContent, $p_projectUrl, $l_pageName)
 {
@@ -653,7 +653,7 @@ MYHMTLPAGE;
 
 /**
  ** @brief The main function
- ** @details Print default html or query MediaWiki API, run visualizer, set messages and print valid xhtml.
+ ** @details Print default html or run visualizer, set messages and print valid xhtml.
  */
 function main()
 {

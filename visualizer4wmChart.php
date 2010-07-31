@@ -1,14 +1,14 @@
 <?php
-/** @file visualizer4wm-chart.php
+/** @file visualizer4wmChart.php
  ** @brief Chart generator
  ** @details Generate the javascript to visualize a wikitable.
  **/
 
 
 /**
- ** @brief Get the wikitable lines from the page content
- ** @param p_content Source code of the wikipage (string)
- ** @param p_templateName The template name
+ ** @brief Generate the chart from the page content
+ ** @param p_content The raw content of the wikipage
+ ** @param p_templateName The visualiser template name
  ** @details Return an array of the wikitable lines:
  */
 function ChartGenerator($p_pageContent, $p_templateName, $p_projectUrl, $p_pageName)

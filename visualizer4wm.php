@@ -1,11 +1,37 @@
 <?php
 /** @file visualizer4wm.php
- ** @brief Visualize data published on a wikimedia project
+ ** @brief Main file: Entry to the visualizer for wikimedia project
  ** @details Visualize data using MediaWiki and charting APIs.
- ** It offers visualization of data published on a wikipage.
+ ** It offers visualization of data published in a table on a wikipage.
  ** Authors include [[w:fr:User:Al Maghi]] and Xavier Marcelet.
  **/
 
+/**
+ * @mainpage Visualizer4wm source code documentation.
+ * Visualizer4wm is a tool to generate charts from wikitable.
+ * For more information check : http://meta.wikimedia.org/wiki/Visualizer4wm
+ *
+ * @htmlonly
+ * <style type="text/css">h2{position: relative;left: -15px;font-size: 140%;}</style>
+ * @endhtmlonly
+ *
+ * @section entry Entry
+ * 
+ * File : visualizer4wm.php
+ * 
+ * - http://toolserver.org/~al/visualizer4wm.php
+ *
+ * @section chart Chart module
+ * 
+ * File : visualizer4wmChart.php
+ *
+ *
+ * @section motionchart Motionchart module
+ * 
+ * File : visualizer4wmMotionchart.php
+ *
+ *
+ */
 
 /**
  ** @brief Get parameter
@@ -70,12 +96,12 @@ function run_visualizer($p_projectUrl, $p_pageName)
   # Generate the chart or exit.
   if ("motionchart"==$l_templateName)
   {
-    require_once("./visualizer4wm-motionchart.php");
+    require_once("./visualizer4wmMotionchart.php");
     $l_chartcode = MotionchartGenerator($l_pageContent, $p_projectUrl, $p_pageName);
   }
   else
   {
-    require_once("./visualizer4wm-chart.php");
+    require_once("./visualizer4wmChart.php");
     $l_chartcode = ChartGenerator($l_pageContent, $l_templateName, $p_projectUrl, $p_pageName);
   }
 

@@ -1,12 +1,12 @@
 <?php
-/** @file visualizer4wm-motionchart.php
+/** @file visualizer4wmMotionchart.php
  ** @brief Motionchart generator
  ** @details Generate the javascript to visualize a {{motionchart}}.
  **/
 
 
 /**
- ** @brief Get the wikitable lines from the page content
+ ** @brief Generate the motion chart from the page content
  ** @param p_content Source code of the wikipage (string)
  ** @details Return an array of the wikitable lines:
  */

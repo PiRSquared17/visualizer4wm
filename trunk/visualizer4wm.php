@@ -53,6 +53,66 @@ function getContentFromMediaWiki ($p_projectUrl,$p_pageName)
 
 
 /**
+ ** @brief Run the visualizer
+ ** @param $p_pageContent The raw content of the page
+ ** @param $p_projectUrl The project url, eg. en.wikipedia.org
+ ** @param $p_pageName The page name
+ ** @param $p_displayedPageName The displayed page name
+ ** @details Get the template name, parse source and generate JavaScript.
+ */
+function run_visualizer($p_pageContent, $p_projectUrl, $l_pageName, $p_displayedPageName)
+{
+  # Get the template name or exit.
+  $l_templateName = get("tpl", "_");
+  if ("_"==$l_templateName || ""==$l_templateName) { exit("Add the visualizer template name to your http request: <tt>&tpl=templateName</tt>"); }
+
+  # Run...
+  if ("motionchart"==$l_templateName)
+  {
+    # Generate the js code for motion chart.
+    $l_javascriptRows = motionChart_generateJsFromContent($p_pageContent);
+    if (null==$l_javascriptRows) {
+      exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$p_displayedPageName</a> is not using correctly {{dataset}} and {{visualize}}.<br />Check the template parameter <tt>tpl=$l_templateName</tt>");
+    }
+    $l_xAxisCaption  = get("x",     "x axis");
+    $l_yAxisCaption  = get("y",     "y axis");
+    $l_groupName     = get("group", "Labels");
+    $l_jscode = motionChart_setJs($l_javascriptRows, $l_groupName, $l_xAxisCaption, $l_yAxisCaption);
+  }
+  else
+  {
+    # Get the chart type and check it.
+    $l_chartType  = get("ct", "pie");
+    $l_chartTypes = array('pie','bar', 'col', 'line', 'scatter', 'area', 'geomap', 'intensitymap', 'sparkline');
+    if ( !in_array( $l_chartType, $l_chartTypes)) {
+      exit("Sorry but the chart type \"$l_chartType\" is not valid.");
+    }
+    # Try to get data from content or exit.
+    $l_dataLines = getWikiTableFromContent($p_pageContent,$l_templateName);
+    if (!is_array($l_dataLines))
+    {
+      switch ($l_dataLines) {
+	case 'no template':
+	  exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$p_displayedPageName</a> does not contain the string: <tt>{{".$l_templateName."</tt><br />Check the template parameter <tt>tpl=</tt>");
+	  break;
+	case 'no table ending':
+	  exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$p_displayedPageName</a> does not contain the line: <tt>|}</tt>");
+	  break;
+	case 'not enough templates':
+	  exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$p_displayedPageName</a> does not include the template ".$l_templateName." <b>as many times as requested</b>.<br />Check the template id parameter <tt>id=</tt>");
+	  break;
+      }
+    }
+    # Generate the js code.
+    $l_jscode = generateChartFromTableLines($l_dataLines, $l_chartType, $p_displayedPageName);
+  }
+
+  # Return the js code.
+  return $l_jscode;
+}
+
+
+/**
  ** @brief Get the wikitable lines from the page content
  ** @param p_content Source code of the wikipage (string)
  ** @param p_templateName The template name
@@ -586,67 +646,6 @@ function printHTML($p_javaScriptCode="",
 MYHMTLPAGE;
 }
 
-
-/**
- ** @brief Run the visualizer
- ** @param $p_pageContent The raw content of the page
- ** @param $p_projectUrl The project url, eg. en.wikipedia.org
- ** @param $p_pageName The page name
- ** @param $p_displayedPageName The displayed page name
- ** @details Get the template name, parse source and generate JavaScript.
- */
-function run_visualizer($p_pageContent, $p_projectUrl, $l_pageName, $p_displayedPageName)
-{
-  # Get the template name or exit.
-  $l_templateName = get("tpl", "_");
-  if ("_"==$l_templateName || ""==$l_templateName)
-  {
-    exit("Add the visualizer template name to your http request: <tt>&tpl=templateName</tt>");
-  }
-
-  if ("motionchart"==$l_templateName)
-  {
-    # Generate the js code for motion chart.
-    $l_javascriptRows = motionChart_generateJsFromContent($p_pageContent);
-    if (null==$l_javascriptRows) {
-      exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$p_displayedPageName</a> is not using correctly {{dataset}} and {{visualize}}.<br />Check the template parameter <tt>tpl=$l_templateName</tt>");
-    }
-    $l_xAxisCaption  = get("x",     "x axis");
-    $l_yAxisCaption  = get("y",     "y axis");
-    $l_groupName     = get("group", "Labels");
-    $l_jscode = motionChart_setJs($l_javascriptRows, $l_groupName, $l_xAxisCaption, $l_yAxisCaption);
-  }
-  else
-  {
-    # Get the chart type and check it.
-    $l_chartType  = get("ct", "pie");
-    $l_chartTypes = array('pie','bar', 'col', 'line', 'scatter', 'area', 'geomap', 'intensitymap', 'sparkline');
-    if ( !in_array( $l_chartType, $l_chartTypes)) {
-      exit("Sorry but the chart type \"$l_chartType\" is not valid.");
-    }
-    # Try to get data from content or exit.
-    $l_dataLines = getWikiTableFromContent($p_pageContent,$l_templateName);
-    if (!is_array($l_dataLines))
-    {
-      switch ($l_dataLines) {
-	case 'no template':
-	  exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$p_displayedPageName</a> does not contain the string: <tt>{{".$l_templateName."</tt><br />Check the template parameter <tt>tpl=</tt>");
-	  break;
-	case 'no table ending':
-	  exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$p_displayedPageName</a> does not contain the line: <tt>|}</tt>");
-	  break;
-	case 'not enough templates':
-	  exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$p_displayedPageName</a> does not include the template ".$l_templateName." <b>as many times as requested</b>.<br />Check the template id parameter <tt>id=</tt>");
-	  break;
-      }
-    }
-    # Generate the js code.
-    $l_jscode = generateChartFromTableLines($l_dataLines, $l_chartType, $p_displayedPageName);
-  }
-
-  # Return the js code.
-  return $l_jscode;
-}
 
 /**
  ** @brief The main function

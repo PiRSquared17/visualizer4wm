@@ -8,6 +8,24 @@
 
 
 /**
+ ** @brief Get the wikitable lines from the page content
+ ** @param p_content Source code of the wikipage (string)
+ ** @details Return an array of the wikitable lines:
+ */
+function MotionchartGenerator($p_pageContent, $p_projectUrl, $p_pageName)
+{
+  $l_javascriptRows = motionChart_generateJsFromContent($p_pageContent);
+  if (null==$l_javascriptRows) {
+    $l_displayedPageName = str_replace('_',' ',$p_pageName);
+    exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$l_displayedPageName</a> is not using correctly {{dataset}} and {{visualize}}.<br />Check the template parameter <tt>tpl=$l_templateName</tt>");
+  }
+  $l_jscode = motionChart_setJs($l_javascriptRows);
+  return $l_jscode;
+}
+
+
+
+/**
  ** @brief motionChart only - Generate javascript rows of data from the page content
  ** @param $p_content The raw content of the page
  ** @details For motion chart:

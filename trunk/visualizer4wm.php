@@ -60,8 +60,6 @@ function getContentFromMediaWiki ($p_projectUrl,$p_pageName)
  */
 function run_visualizer($p_projectUrl, $p_pageName)
 {
-  $l_displayedPageName = str_replace('_',' ',$p_pageName);
-
   # Get the template name or exit.
   $l_templateName = get("tpl", "_");
   if ("_"==$l_templateName || ""==$l_templateName) { exit("Add the visualizer template name to your http request: <tt>&tpl=templateName</tt>"); }
@@ -69,51 +67,19 @@ function run_visualizer($p_projectUrl, $p_pageName)
   # Try to get content from MediaWiki or exit.
   $l_pageContent = getContentFromMediaWiki($p_projectUrl, $p_pageName);
 
-  # Run...
+  # Generate the chart or exit.
   if ("motionchart"==$l_templateName)
   {
     require_once("./visualizer4wm-motionchart.php");
-
-    # Generate the js code for motion chart.
-    $l_javascriptRows = motionChart_generateJsFromContent($l_pageContent);
-    if (null==$l_javascriptRows) {
-      exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$l_displayedPageName</a> is not using correctly {{dataset}} and {{visualize}}.<br />Check the template parameter <tt>tpl=$l_templateName</tt>");
-    }
-    $l_jscode = motionChart_setJs($l_javascriptRows);
+    $l_chartcode = MotionchartGenerator($l_pageContent, $p_projectUrl, $p_pageName);
   }
   else
   {
-    # Get the chart type and check it.
-    $l_chartType  = get("ct", "pie");
-    $l_chartTypes = array('pie','bar', 'col', 'line', 'scatter', 'area', 'geomap', 'intensitymap', 'sparkline');
-    if ( !in_array( $l_chartType, $l_chartTypes)) {
-      exit("Sorry but the chart type \"$l_chartType\" is not valid.");
-    }
-
     require_once("./visualizer4wm-chart.php");
-
-    # Try to get data from content or exit.
-    $l_dataLines = getWikiTableFromContent($l_pageContent,$l_templateName);
-    if (!is_array($l_dataLines))
-    {
-      switch ($l_dataLines) {
-	case 'no template':
-	  exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$l_displayedPageName</a> does not contain the string: <tt>{{".$l_templateName."</tt><br />Check the template parameter <tt>tpl=</tt>");
-	  break;
-	case 'no table ending':
-	  exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$l_displayedPageName</a> does not contain the line: <tt>|}</tt>");
-	  break;
-	case 'not enough templates':
-	  exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$l_displayedPageName</a> does not include the template ".$l_templateName." <b>as many times as requested</b>.<br />Check the template id parameter <tt>id=</tt>");
-	  break;
-      }
-    }
-    # Generate the js code.
-    $l_jscode = generateChartFromTableLines($l_dataLines, $l_chartType, $l_displayedPageName);
+    $l_chartcode = ChartGenerator($l_pageContent, $l_templateName, $p_projectUrl, $p_pageName);
   }
 
-  # Return the js code.
-  return $l_jscode;
+  return $l_chartcode;
 }
 
 
@@ -239,13 +205,13 @@ function main()
   }
 
   # Run the visualizer.
-  $l_jscode = run_visualizer($l_projectUrl, $l_pageName);
+  $l_visualization = run_visualizer($l_projectUrl, $l_pageName);
 
   # Set the i18n messages.
   $l_msg = setMessages($l_projectUrl, $l_pageName);
 
   # Print HTML.
-  printHTML($l_jscode,$l_msg['visualizer4mw-info'],$l_msg['visualizer4mw'],$l_msg['is_rtl']);
+  printHTML($l_visualization, $l_msg['visualizer4mw-info'], $l_msg['visualizer4mw'], $l_msg['is_rtl']);
 }
 
 main();

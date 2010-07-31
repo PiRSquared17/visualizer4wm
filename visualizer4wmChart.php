@@ -7,9 +7,11 @@
 
 /**
  ** @brief Generate the chart from the page content
- ** @param p_content The raw content of the wikipage
- ** @param p_templateName The visualiser template name
- ** @details Return an array of the wikitable lines:
+ ** @param p_pageContent The raw content of the wikipage.
+ ** @param p_templateName The visualizer template name.
+ ** @param $p_projectUrl The project url, eg. en.wikipedia.org.
+ ** @param $p_pageName The page name.
+ ** @return the javaScript chart code.
  */
 function ChartGenerator($p_pageContent, $p_templateName, $p_projectUrl, $p_pageName)
 {
@@ -47,28 +49,25 @@ function ChartGenerator($p_pageContent, $p_templateName, $p_projectUrl, $p_pageN
 
 /**
  ** @brief Get the wikitable lines from the page content
- ** @param p_content Source code of the wikipage (string)
- ** @param p_templateName The template name
+ ** @param p_pageContent The raw content of the wikipage.
+ ** @param p_templateName The visualizer template name.
  ** @details Return an array of the wikitable lines:
- ** {|
- ** |+ {{visualizer}}
- ** ! ''en'' !! 2003/0/1 !! East
- ** |-
- ** | [[France]] || 68465 || 26843 
- ** |}
  **
- ** -> to
+ ** <code>|+ {{visualizer}}
+ ** ! en !! 2003/0/1 !! East</code>
+ **
+ ** to
  **
  ** line[0]:  ! en !! 2003/0/1 !! East
- ** line[1]:  |France || 68465 || 26843
+ ** line[1]:  ...
  */
-function getWikiTableFromContent($p_content, $p_templateName)
+function getWikiTableFromContent($p_pageContent, $p_templateName)
 {
   // Remove everything before the template.
-  $l_tableContent = strstr($p_content, "{{".ucfirst($p_templateName));
+  $l_tableContent = strstr($p_pageContent, "{{".ucfirst($p_templateName));
   if (false==$l_tableContent)
   {
-    $l_tableContent = strstr($p_content, "{{".lcfirst($p_templateName));
+    $l_tableContent = strstr($p_pageContent, "{{".lcfirst($p_templateName));
     if (false==$l_tableContent) { return "no template"; }
   }
 
@@ -105,7 +104,7 @@ function getWikiTableFromContent($p_content, $p_templateName)
 
 /**
  ** @brief Remove the unwanted wiki syntax 
- ** @param $p_input String to clean
+ ** @param $p_input The string to clean.
  ** @details Return the input without wikilinks, references, etc.
  **
  */
@@ -158,8 +157,8 @@ function cleanWikitableContent($p_input)
 
 /**
  ** @brief Remove regexp matches
- ** @param $p_regexp Regular expression
- ** @param $p_input String to clean
+ ** @param $p_regexp Regular expression.
+ ** @param $p_input The string to clean.
  ** @details Return a clean string.
  **
  */
@@ -182,10 +181,10 @@ function removeRegexpMatch($p_regexp,$p_input)
 
 /**
  ** @brief Generate the chart from the table lines
- ** @param $p_dataLines Array of lines from the wikitable,
- ** @param $p_ct the chart type,
- ** @param $p_displayedPageName The displayed page name
- ** @details Return an array of the html and js to be printed.
+ ** @param $p_dataLines Array of lines from the wikitable.
+ ** @param $p_ct the chart type.
+ ** @param $p_displayedPageName The displayed page name.
+ ** @details Return the js to be printed.
  **
  */
 function generateChartFromTableLines($p_dataLines,$p_ct, $p_displayedPageName)
@@ -332,7 +331,7 @@ MYJSCODE;
 
 /**
  ** @brief Get data from the wikitable lines
- ** @param $p_dataLines Array of lines from the wikitable,
+ ** @param $p_dataLines Array of lines from the wikitable.
  ** @details Return an array of the data.
  **
  */

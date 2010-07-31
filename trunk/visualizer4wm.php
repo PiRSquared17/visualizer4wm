@@ -54,12 +54,11 @@ function getContentFromMediaWiki ($p_projectUrl,$p_pageName)
 
 /**
  ** @brief Run the visualizer
- ** @param $p_pageContent The raw content of the page
  ** @param $p_projectUrl The project url, eg. en.wikipedia.org
  ** @param $p_pageName The page name
  ** @details Get the template name, query MediaWiki API, parse source and generate JavaScript.
  */
-function run_visualizer($p_pageContent, $p_projectUrl, $l_pageName)
+function run_visualizer($p_projectUrl, $p_pageName)
 {
   $l_displayedPageName = str_replace('_',' ',$p_pageName);
 
@@ -74,7 +73,7 @@ function run_visualizer($p_pageContent, $p_projectUrl, $l_pageName)
   if ("motionchart"==$l_templateName)
   {
     # Generate the js code for motion chart.
-    $l_javascriptRows = motionChart_generateJsFromContent($p_pageContent);
+    $l_javascriptRows = motionChart_generateJsFromContent($l_pageContent);
     if (null==$l_javascriptRows) {
       exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$l_displayedPageName</a> is not using correctly {{dataset}} and {{visualize}}.<br />Check the template parameter <tt>tpl=$l_templateName</tt>");
     }
@@ -92,7 +91,7 @@ function run_visualizer($p_pageContent, $p_projectUrl, $l_pageName)
       exit("Sorry but the chart type \"$l_chartType\" is not valid.");
     }
     # Try to get data from content or exit.
-    $l_dataLines = getWikiTableFromContent($p_pageContent,$l_templateName);
+    $l_dataLines = getWikiTableFromContent($l_pageContent,$l_templateName);
     if (!is_array($l_dataLines))
     {
       switch ($l_dataLines) {
@@ -680,7 +679,7 @@ function main()
   }
 
   # Run the visualizer.
-  $l_jscode = run_visualizer($l_pageContent, $l_projectUrl, $l_pageName);
+  $l_jscode = run_visualizer($l_projectUrl, $l_pageName);
 
   # Set the i18n messages.
   $l_msg = setMessages($l_projectUrl, $l_pageName);

@@ -1,14 +1,13 @@
 <?php
 /** @file visualizer4wm.php
  ** @brief The entry to visualizer4wm
- ** @author [[User:Al Maghi]] and Xavier Marcelet.
+ ** @author Al Maghi and Xavier Marcelet.
  **/
 
 /**
- * @mainpage Visualizer4wm source code documentation.
- * <center>Visualizer4wm is a tool to generate charts from a wikitable.
- *
- * For more information check: http://meta.wikimedia.org/wiki/Visualizer4wm
+ * @mainpage Visualizer4wm code documentation
+ * <center>
+ * For more information, see: http://meta.wikimedia.org/wiki/Visualizer4wm
  * </center>
  *
  * @htmlonly
@@ -31,7 +30,7 @@
  * 
  * File : visualizer4wmMotionchart.php
  *
- *
+ * <br>
  */
 
 /**

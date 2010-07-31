@@ -1,15 +1,15 @@
 <?php
 /** @file visualizer4wm.php
- ** @brief Main file: Entry to the visualizer for wikimedia project
- ** @details Visualize data using MediaWiki and charting APIs.
- ** It offers visualization of data published in a table on a wikipage.
- ** Authors include [[w:fr:User:Al Maghi]] and Xavier Marcelet.
+ ** @brief The entry to visualizer4wm
+ ** @author [[User:Al Maghi]] and Xavier Marcelet.
  **/
 
 /**
  * @mainpage Visualizer4wm source code documentation.
- * Visualizer4wm is a tool to generate charts from wikitable.
- * For more information check : http://meta.wikimedia.org/wiki/Visualizer4wm
+ * <center>Visualizer4wm is a tool to generate charts from a wikitable.
+ *
+ * For more information check: http://meta.wikimedia.org/wiki/Visualizer4wm
+ * </center>
  *
  * @htmlonly
  * <style type="text/css">h2{position: relative;left: -15px;font-size: 140%;}</style>
@@ -18,8 +18,9 @@
  * @section entry Entry
  * 
  * File : visualizer4wm.php
- * 
- * - http://toolserver.org/~al/visualizer4wm.php
+ *
+ * - Run at http://toolserver.org/~al/visualizer4wm.php
+ *
  *
  * @section chart Chart module
  * 
@@ -35,9 +36,9 @@
 
 /**
  ** @brief Get parameter
- ** @param p_name Name of the url arg
- ** @param p_default Default value for the parameter
- ** @details Get parameter from url arguments
+ ** @param p_name Name of the url argument.
+ ** @param p_default Default value for the parameter.
+ ** @details Get parameter from url arguments.
  */
 function get($p_name, $p_default=null)
 {
@@ -51,9 +52,9 @@ function get($p_name, $p_default=null)
 
 /**
  ** @brief Get the page content with MediaWiki API
- ** @param $p_projectUrl The project url, eg. en.wikipedia.org
- ** @param $p_pageName The page name
- ** @details Return the raw content of the page.
+ ** @param $p_projectUrl The project url, eg. en.wikipedia.org.
+ ** @param $p_pageName The page name.
+ ** @details Return the raw content of the wikipage.
  **
  */
 function getContentFromMediaWiki ($p_projectUrl,$p_pageName)
@@ -80,8 +81,9 @@ function getContentFromMediaWiki ($p_projectUrl,$p_pageName)
 
 /**
  ** @brief Run the visualizer
- ** @param $p_projectUrl The project url, eg. en.wikipedia.org
- ** @param $p_pageName The page name
+ ** @param $p_projectUrl The project url, eg. en.wikipedia.org.
+ ** @param $p_pageName The page name.
+ ** @return the javaScript chart code.
  ** @details Get the template name, query MediaWiki API, parse source and generate JavaScript.
  */
 function run_visualizer($p_projectUrl, $p_pageName)
@@ -111,9 +113,9 @@ function run_visualizer($p_projectUrl, $p_pageName)
 
 /**
  ** @brief Set the system messages
- ** @param $p_projectUrl The project url, eg. en.wikipedia.org
- ** @param $p_pageName The page name
- ** @details Get language and return its messages
+ ** @param $p_projectUrl The project url, eg. en.wikipedia.org.
+ ** @param $p_pageName The page name.
+ ** @details Get language and return its messages.
  */
 function setMessages($p_projectUrl,$p_pageName)
 {
@@ -139,10 +141,10 @@ function setMessages($p_projectUrl,$p_pageName)
 
 /**
  ** @brief Echo HTML document
- ** @param $p_javaScriptCode 
- ** @param $p_htmlCode
- ** @param $p_title Document title and header
- ** @param $p_ltr left-to-right or rtl language
+ ** @param $p_javaScriptCode The document javaScript. 
+ ** @param $p_htmlCode The document main html division.
+ ** @param $p_title The document title and header.
+ ** @param $p_ltr The language direction: ".rtl" or empty.
  ** @details Print valid XHTML
  **
  */
@@ -194,7 +196,7 @@ function printHTML($p_javaScriptCode="",
       &#8734; &nbsp; <a href="http://meta.wikimedia.org/wiki/visualizer4wm">documentation</a> &nbsp;
       &#8734; &nbsp; The visualizer tool is kindly served to you by the <a href="http://toolserver.org/">Wikimedia Toolserver</a>.
       	It uses the <a href="http://mediawiki.org/wiki/API">MediaWiki</a>
-      	and the <a href="http://code.google.com/intl/en-EN/apis/visualization/interactive_charts.html">Vizualisation</a></span> APIs.
+      	and the <a href="http://code.google.com/intl/en-EN/apis/visualization/interactive_charts.html">Visualization</a></span> APIs.
     </div>
   </body>
 </html>
@@ -204,7 +206,7 @@ MYHMTLPAGE;
 
 /**
  ** @brief The main function
- ** @details Print default html or run visualizer, set messages and print valid xhtml.
+ ** @details Print default html or run visualizer, set messages and print chart.
  */
 function main()
 {

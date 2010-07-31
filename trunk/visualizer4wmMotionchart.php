@@ -7,8 +7,10 @@
 
 /**
  ** @brief Generate the motion chart from the page content
- ** @param p_content Source code of the wikipage (string)
- ** @details Return an array of the wikitable lines:
+ ** @param p_pageContent The raw content of the wikipage.
+ ** @param $p_projectUrl The project url, eg. en.wikipedia.org.
+ ** @param $p_pageName The page name.
+ ** @return the javaScript chart code.
  */
 function MotionchartGenerator($p_pageContent, $p_projectUrl, $p_pageName)
 {
@@ -25,15 +27,13 @@ function MotionchartGenerator($p_pageContent, $p_projectUrl, $p_pageName)
 /**
  ** @brief motionChart only - Generate javascript rows of data from the page content
  ** @param $p_content The raw content of the page
- ** @details For motion chart:
+ ** @details 
  ** {{motionchart|
- **  {{dataset| en | 2003/0/1 | 10000 | 20000 | East }}
- **  {{dataset| fr | 2003/0/1 | 5000 | 10000 | West }}
+ **  {{dataset| en | 2003/0/1 | 100 | 200 | East }}
  **
- **     to ->
+ **  to
  **
- ** ['fr',new Date (2003,0,1),5000,10000,'West'],
- ** ['it',new Date (2003,0,1),3000,7000,'East'],
+ ** ['en',new Date (2003,0,1),100,200,'East'],
  */
 function motionChart_generateJsFromContent($p_content)
 {
@@ -70,10 +70,7 @@ function motionChart_generateJsFromContent($p_content)
 
 /**
  ** @brief motionChart only - Set the js to be printed
- ** @param $p_javaScriptRows,
- ** @param $p_groupName,
- ** @param $p_xAxisCaption,
- ** @param $p_yAxisCaption
+ ** @param $p_javaScriptRows
  ** @details For motion chart: return the js to be printed.
  **
  */

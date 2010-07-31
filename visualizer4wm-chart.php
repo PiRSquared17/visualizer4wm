@@ -12,6 +12,46 @@
  ** @param p_content Source code of the wikipage (string)
  ** @param p_templateName The template name
  ** @details Return an array of the wikitable lines:
+ */
+function ChartGenerator($p_pageContent, $p_templateName, $p_projectUrl, $p_pageName)
+{
+  $l_displayedPageName = str_replace('_',' ',$p_pageName);
+
+  # Get the chart type and check it.
+  $l_chartType  = get("ct", "pie");
+  $l_chartTypes = array('pie','bar', 'col', 'line', 'scatter', 'area', 'geomap', 'intensitymap', 'sparkline');
+  if ( !in_array( $l_chartType, $l_chartTypes)) {
+    exit("Sorry but the chart type \"$l_chartType\" is not valid.");
+  }
+
+  # Try to get data from content or exit.
+  $l_dataLines = getWikiTableFromContent($p_pageContent,$p_templateName);
+  if (!is_array($l_dataLines))
+  {
+    switch ($l_dataLines) {
+      case 'no template':
+	exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$l_displayedPageName</a> does not contain the string: <tt>{{".$p_templateName."</tt><br />Check the template parameter <tt>tpl=</tt>");
+	break;
+      case 'no table ending':
+	exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$l_displayedPageName</a> does not contain the line: <tt>|}</tt>");
+	break;
+      case 'not enough templates':
+	exit("Sorry, the page <a href=\"http://$p_projectUrl/wiki/$p_pageName\">$l_displayedPageName</a> does not include the template ".$p_templateName." <b>as many times as requested</b>.<br />Check the template id parameter <tt>id=</tt>");
+	break;
+    }
+  }
+  # Generate the js code.
+  $l_jscode = generateChartFromTableLines($l_dataLines, $l_chartType, $l_displayedPageName);
+  # Return the js code.
+  return $l_jscode;
+}
+
+
+/**
+ ** @brief Get the wikitable lines from the page content
+ ** @param p_content Source code of the wikipage (string)
+ ** @param p_templateName The template name
+ ** @details Return an array of the wikitable lines:
  ** {|
  ** |+ {{visualizer}}
  ** ! ''en'' !! 2003/0/1 !! East

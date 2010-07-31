@@ -70,7 +70,7 @@ function motionChart_generateJsFromContent($p_content)
 
 /**
  ** @brief motionChart only - Set the js to be printed
- ** @param $p_javaScriptRows
+ ** @param p_javascriptRows The javascript rows of data.
  ** @details For motion chart: return the js to be printed.
  **
  */

@@ -185,7 +185,7 @@ function printHTML($p_javaScriptCode="",
     <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
     <title>$p_title - visualize the data published on a wikipage</title>
     $p_javaScriptCode
-    <link rel="stylesheet" href="./visualizer4wm$p_ltr.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="./css/visualizer4wm$p_ltr.css" type="text/css" media="screen" />
   </head>
   <body>
     <div id="mw_header"><a href="./visualizer4wm.php">$p_title</a><br /><span>Wikimedia toolserver</span></div>

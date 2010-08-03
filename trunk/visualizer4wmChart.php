@@ -117,6 +117,7 @@ function cleanWikitableContent($p_input)
 		      "align=(.*)\|",
 		      "style=(.*)\|",
 		      "width=(.*)\|",
+		      "scope=(.*)\|",
 		      "&lt;sup&gt;(.*)&lt;\/sup&gt;",
 		      "&lt;sub&gt;(.*)&lt;\/sub&gt;"
   );

@@ -234,10 +234,19 @@ function main()
   # Run the visualizer.
   $l_visualization = run_visualizer($l_projectUrl, $l_pageName);
 
-  # Get the output type
+  # Get the view type.
   $l_view=get("view", "html");
-  if ("chart"==$l_view) exit($l_visualization.'<div id="chart_div"></div>');
-  if ("js"==$l_view) exit(strstr(substr($l_visualization,0, -strlen('</script>')), 'google.load'));
+  if ("html"!=$l_view)
+  {
+    if ("js"==$l_view) {
+      $l_out = strstr(substr($l_visualization, 0, -strlen('</script>')), 'google.load');
+    } else {
+      $l_out = $l_visualization.'<div id="chart_div"></div>';
+    }
+    $l_div=get("div", "chart_div");
+    if ('chart_div'!=$l_div) $l_out=str_replace('chart_div', $l_div, $l_out);
+    exit($l_out);
+  }
 
   # Set the i18n messages.
   $l_msg = setMessages($l_projectUrl, $l_pageName);

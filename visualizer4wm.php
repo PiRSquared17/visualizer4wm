@@ -116,10 +116,9 @@ function run_visualizer($p_projectUrl, $p_pageName)
  ** @param $p_pageName The page name.
  ** @details Get language and return its messages.
  */
-function setMessages($p_projectUrl,$p_pageName)
+function setMessages($p_projectUrl,$p_pageName,$lang)
 {
   require_once("./visualizer4wm.i18n.php");
-  $lang=get("lang", "en");
   $l_rtlCode="";
 
   if(isset($messages[$lang])) {
@@ -234,8 +233,12 @@ function main()
   # Run the visualizer.
   $l_visualization = run_visualizer($l_projectUrl, $l_pageName);
 
+  # api
+  $lang=get("lang", "en");
+  if ("API"==$lang) exit($l_visualization.'<div id="chart_div"></div>');
+
   # Set the i18n messages.
-  $l_msg = setMessages($l_projectUrl, $l_pageName);
+  $l_msg = setMessages($l_projectUrl, $l_pageName, $lang);
 
   # Print HTML.
   printHTML($l_visualization, $l_msg['visualizer4mw-info'], $l_msg['visualizer4mw'], $l_msg['is_rtl']);
